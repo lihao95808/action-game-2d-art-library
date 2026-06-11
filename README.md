@@ -4,7 +4,7 @@ This repository is a generated, public WebP preview and review site for Action_G
 
 - Site: https://lihao95808.github.io/action-game-2d-art-library/
 - Source repo: https://github.com/lihao95808/godot-action-brawler.git
-- Latest source commit: `57035f17d2b05542166e2297818feb47fcdea741`
+- Latest source commit: `382ab3c9ed9026c696a463c2ec6e42b4897a05e7`
 - Preview policy: WebP only; PNG originals stay in the source workflow.
 - Review policy: browser-local review first, export JSON, then merge with `tools/apply_art_review.py`.
 
