@@ -4,11 +4,15 @@ This repository is a generated, public WebP preview and review site for Action_G
 
 - Site: https://lihao95808.github.io/action-game-2d-art-library/
 - Source repo: https://github.com/lihao95808/godot-action-brawler.git
-- Latest source commit: `4bde812f6931b4cf37b1334601e504e5ab3cc1c6`
+- Latest source commit: `13dd619300fb0753f6589a2f70435101ff92c40c`
 - Unified workbench: `index.html`
 - Image review module: `image_review.html`
-- Sequence review module: `sequences.html`
+- Character workspace module: `character_workspace.html`
+- Sequence review module: `sequences.html` (nested inside the character workflow)
 - Static image review data: `data/review_manifest.json`
+- Character source data: `data/character_manifest.json`
+- Character edit drafts: `data/character_edit_manifest.json`
+- Character job queue: `data/character_jobs.json`
 - Sequence review data: `data/sequence_review_manifest.json`
 - Sequence job queue: `data/sequence_jobs.json`
 - Preview policy: publish WebP previews; originals stay in the source workflow.

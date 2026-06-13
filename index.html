@@ -148,7 +148,7 @@
     <aside>
       <div class="brand">
         <h1>Action Game 2D 创作评审工作台</h1>
-        <div class="subtitle">一个 GitHub Pages 入口承载图片评审、动作审片、生成请求和后续创作能力。</div>
+        <div class="subtitle">顶层只分 UI 风格和人物两个面板；人物面板承载动作、视频和序列帧流程。</div>
       </div>
       <div class="stats" id="stats"></div>
       <div class="module-list" id="moduleList"></div>
@@ -171,37 +171,23 @@
     </main>
   </div>
   <script>
-    const stats = {"asset_count": 140, "sequence_count": 26, "image_review_count": 0, "sequence_review_count": 0, "job_count": 0, "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6", "site_base_url": "https://lihao95808.github.io/action-game-2d-art-library/"};
+    const stats = {"asset_count": 140, "sequence_count": 26, "character_count": 8, "image_review_count": 0, "sequence_review_count": 0, "job_count": 0, "character_job_count": 0, "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c", "site_base_url": "https://lihao95808.github.io/action-game-2d-art-library/"};
     const modules = [
       {
         id: "ui-review",
-        name: "UI 风格评审",
-        badge: "可评审",
+        name: "UI 风格",
+        badge: "主面板",
         src: "image_review.html",
-        description: "140 张 UI 风格探索图。用于评分、候选、隐藏、备注、标签，以及图片评审 JSON 同步。",
+        description: "UI 风格探索图评审、评分、候选、隐藏、备注、标签，以及图片评审 JSON 同步。",
         meta: stats.asset_count + " 张图片 / 已评审 " + stats.image_review_count
       },
       {
-        id: "sequence-review",
-        name: "动作序列审片",
-        badge: "可评审",
-        src: "sequences.html",
-        description: "角色选择 idle、celebrate 等动作序列。用于看动图、调 loop 参数、标记问题、写重抽帧/重生成请求。",
-        meta: stats.sequence_count + " 个序列 / 已评审 " + stats.sequence_review_count + " / 请求 " + stats.job_count
-      },
-      {
-        id: "generation-queue",
-        name: "生成请求队列",
-        badge: "预留",
-        description: "后续用于集中展示 Seedance/GPT Image/抽帧/重生成任务状态。目前请求仍在动作序列模块中同步。",
-        meta: "未来模块"
-      },
-      {
-        id: "candidate-board",
-        name: "候选与定稿看板",
-        badge: "预留",
-        description: "后续用于把 UI 候选、动作候选、Godot POC 采用情况汇总成制作决策面板。",
-        meta: "未来模块"
+        id: "character-workspace",
+        name: "人物",
+        badge: "主面板",
+        src: "character_workspace.html",
+        description: "人物源头、人设文本、人设图、站立图、动作表、Seedance 请求、序列帧审片和调优。",
+        meta: stats.character_count + " 个人物 / " + stats.sequence_count + " 个序列 / 人物请求 " + stats.character_job_count
       }
     ];
     const moduleList = document.getElementById("moduleList");
@@ -215,9 +201,9 @@
 
     document.getElementById("stats").innerHTML = [
       ["图片", stats.asset_count],
-      ["序列", stats.sequence_count],
+      ["人物", stats.character_count],
       ["图片评审", stats.image_review_count],
-      ["动作请求", stats.job_count]
+      ["人物请求", stats.character_job_count]
     ].map(([label, value]) => '<div class="stat"><strong>' + escapeHtml(value) + '</strong><span>' + escapeHtml(label) + '</span></div>').join("");
 
     for (const mod of modules) {
@@ -263,7 +249,7 @@
       return String(value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
     }
     function escapeAttr(value) { return escapeHtml(value).replace(/`/g, "&#096;"); }
-    activateModule((location.hash || "#ui-review").slice(1), false);
+    activateModule((location.hash || "#character-workspace").slice(1), false);
   </script>
 </body>
 </html>

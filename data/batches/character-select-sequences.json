@@ -1,8 +1,8 @@
 {
   "batch_id": "character-select-sequences",
-  "created_at": "2026-06-13T09:52:53",
+  "created_at": "2026-06-13T15:51:06",
   "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-  "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
+  "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
   "sequence_count": 26,
   "sequences": [
     {
@@ -151,8 +151,8 @@
       "sheet_bytes": 329212,
       "cover_bytes": 11936,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:02"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:25"
     },
     {
       "sequence_id": "celebrate_juno_kick_local_fresh",
@@ -300,8 +300,8 @@
       "sheet_bytes": 329212,
       "cover_bytes": 12826,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:05"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:27"
     },
     {
       "sequence_id": "idle_juno_kick_idle",
@@ -449,8 +449,8 @@
       "sheet_bytes": 283828,
       "cover_bytes": 10676,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:07"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:28"
     },
     {
       "sequence_id": "idle_juno_kick_local_fresh",
@@ -598,8 +598,8 @@
       "sheet_bytes": 283828,
       "cover_bytes": 11048,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:09"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:30"
     },
     {
       "sequence_id": "celebrate_kai_volt_celebrate",
@@ -747,8 +747,8 @@
       "sheet_bytes": 259140,
       "cover_bytes": 11256,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:11"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:32"
     },
     {
       "sequence_id": "celebrate_kai_volt_local_fresh",
@@ -896,8 +896,8 @@
       "sheet_bytes": 259140,
       "cover_bytes": 10812,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:13"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:33"
     },
     {
       "sequence_id": "idle_kai_volt_idle",
@@ -1045,8 +1045,8 @@
       "sheet_bytes": 262040,
       "cover_bytes": 10960,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:15"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:35"
     },
     {
       "sequence_id": "idle_kai_volt_local_fresh",
@@ -1194,8 +1194,8 @@
       "sheet_bytes": 262040,
       "cover_bytes": 10718,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:17"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:36"
     },
     {
       "sequence_id": "celebrate_lux_vale_celebrate",
@@ -1343,8 +1343,8 @@
       "sheet_bytes": 260480,
       "cover_bytes": 11102,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:19"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:38"
     },
     {
       "sequence_id": "celebrate_lux_vale_local_fresh",
@@ -1492,8 +1492,8 @@
       "sheet_bytes": 260480,
       "cover_bytes": 11376,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:21"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:39"
     },
     {
       "sequence_id": "idle_lux_vale_idle",
@@ -1641,8 +1641,8 @@
       "sheet_bytes": 292958,
       "cover_bytes": 11964,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:23"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:41"
     },
     {
       "sequence_id": "idle_lux_vale_local_fresh",
@@ -1790,8 +1790,8 @@
       "sheet_bytes": 292958,
       "cover_bytes": 11904,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:25"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:43"
     },
     {
       "sequence_id": "celebrate_maya_comet_celebrate",
@@ -1939,8 +1939,8 @@
       "sheet_bytes": 267740,
       "cover_bytes": 11064,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:27"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:44"
     },
     {
       "sequence_id": "celebrate_maya_comet_local_fresh",
@@ -2088,8 +2088,8 @@
       "sheet_bytes": 267740,
       "cover_bytes": 10516,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:30"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:46"
     },
     {
       "sequence_id": "idle_maya_comet_idle",
@@ -2237,8 +2237,8 @@
       "sheet_bytes": 271654,
       "cover_bytes": 10832,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:32"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:47"
     },
     {
       "sequence_id": "idle_maya_comet_local_fresh",
@@ -2386,8 +2386,8 @@
       "sheet_bytes": 271654,
       "cover_bytes": 10836,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:34"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:49"
     },
     {
       "sequence_id": "celebrate_nova_palm_celebrate",
@@ -2535,8 +2535,8 @@
       "sheet_bytes": 261410,
       "cover_bytes": 11308,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:36"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:51"
     },
     {
       "sequence_id": "celebrate_nova_palm_local_fresh",
@@ -2684,8 +2684,8 @@
       "sheet_bytes": 261410,
       "cover_bytes": 11336,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:38"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:52"
     },
     {
       "sequence_id": "idle_nova_palm_idle",
@@ -2833,8 +2833,8 @@
       "sheet_bytes": 268812,
       "cover_bytes": 11382,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:40"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:54"
     },
     {
       "sequence_id": "idle_nova_palm_local_fresh",
@@ -2982,8 +2982,8 @@
       "sheet_bytes": 268812,
       "cover_bytes": 11260,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:42"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:56"
     },
     {
       "sequence_id": "celebrate_rosa_rivet_celebrate",
@@ -3131,8 +3131,8 @@
       "sheet_bytes": 258090,
       "cover_bytes": 10874,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:44"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:57"
     },
     {
       "sequence_id": "celebrate_rosa_rivet_local_fresh",
@@ -3280,8 +3280,8 @@
       "sheet_bytes": 258090,
       "cover_bytes": 11254,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:46"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:50:59"
     },
     {
       "sequence_id": "idle_rosa_rivet_idle",
@@ -3429,8 +3429,8 @@
       "sheet_bytes": 267790,
       "cover_bytes": 11558,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:48"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:51:00"
     },
     {
       "sequence_id": "idle_rosa_rivet_local_fresh",
@@ -3578,8 +3578,8 @@
       "sheet_bytes": 267790,
       "cover_bytes": 11484,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:50"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:51:02"
     },
     {
       "sequence_id": "idle_seedance_artdoc_probe_artdoc_v1",
@@ -3727,8 +3727,8 @@
       "sheet_bytes": 203078,
       "cover_bytes": 5192,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:52"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:51:03"
     },
     {
       "sequence_id": "idle_seedance_probe_seedance",
@@ -3876,8 +3876,8 @@
       "sheet_bytes": 200538,
       "cover_bytes": 4886,
       "source_repo": "https://github.com/lihao95808/godot-action-brawler.git",
-      "source_commit": "4bde812f6931b4cf37b1334601e504e5ab3cc1c6",
-      "published_at": "2026-06-13T09:52:53"
+      "source_commit": "13dd619300fb0753f6589a2f70435101ff92c40c",
+      "published_at": "2026-06-13T15:51:04"
     }
   ]
 }

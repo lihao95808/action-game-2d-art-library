@@ -1,0 +1,786 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-06-13T15:51:06",
+  "site_base_url": "https://lihao95808.github.io/action-game-2d-art-library/",
+  "character_count": 8,
+  "characters": [
+    {
+      "character_id": "juno_kick",
+      "display_name": "Juno Kick",
+      "short_label": "JUNO",
+      "status": "active",
+      "role": "rush fighter",
+      "background": "",
+      "personality": "",
+      "preferences": "",
+      "action_style": "fast close-range kicking rhythm, upbeat arcade confidence",
+      "persona_text": "Juno Kick is a compact sunny arcade brawler hero built around quick footwork, readable kicks, and confident selection-screen energy.",
+      "concept_art": {
+        "status": "reference",
+        "prompt": "",
+        "assets": [
+          {
+            "path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_09.png",
+            "role": "current character design reference",
+            "preview": "assets/character-pipeline/juno_kick/concept_00.webp"
+          }
+        ]
+      },
+      "standing_idle": {
+        "status": "needed",
+        "prompt": "",
+        "assets": []
+      },
+      "actions": [
+        {
+          "action_id": "celebrate",
+          "display_name": "选中庆祝",
+          "status": "active",
+          "design_text": "Small grounded selected-hero flourish that returns near the ready stance.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "celebrate_juno_kick_celebrate",
+              "version": "celebrate",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_juno_kick_celebrate/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_juno_kick_celebrate/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_juno_kick_celebrate/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/celebrate/celebrate_juno_kick_celebrate.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/juno_kick/celebrate/juno_kick_celebrate_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "celebrate_juno_kick_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/celebrate/celebrate_juno_kick_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/juno_kick/celebrate/juno_kick_celebrate_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        },
+        {
+          "action_id": "idle",
+          "display_name": "待机",
+          "status": "active",
+          "design_text": "Compact combat guard, planted feet, subtle breathing and small weight shifts.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "idle_juno_kick_idle",
+              "version": "idle",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_juno_kick_idle/preview.webp",
+              "cover": "assets/character-select-sequences/idle_juno_kick_idle/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_juno_kick_idle/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/idle/idle_juno_kick_idle.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/juno_kick/idle/juno_kick_idle_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "idle_juno_kick_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_juno_kick_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/idle_juno_kick_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_juno_kick_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/idle/idle_juno_kick_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/juno_kick/idle/juno_kick_idle_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "source": "character_manifest",
+      "sequence_count": 4,
+      "action_count": 2
+    },
+    {
+      "character_id": "kai_volt",
+      "display_name": "Kai Volt",
+      "short_label": "KAI",
+      "status": "active",
+      "role": "electric striker",
+      "background": "",
+      "personality": "",
+      "preferences": "",
+      "action_style": "sharp rhythm, electric confidence, compact striker poses",
+      "persona_text": "Kai Volt reads as a bright arcade striker with snappy timing and clean, energetic silhouettes.",
+      "concept_art": {
+        "status": "reference",
+        "prompt": "",
+        "assets": [
+          {
+            "path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_05.png",
+            "role": "current character design reference",
+            "preview": "assets/character-pipeline/kai_volt/concept_00.webp"
+          }
+        ]
+      },
+      "standing_idle": {
+        "status": "needed",
+        "prompt": "",
+        "assets": []
+      },
+      "actions": [
+        {
+          "action_id": "celebrate",
+          "display_name": "选中庆祝",
+          "status": "active",
+          "design_text": "Brief confident spark-like pose language without VFX in the sprite pass.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "celebrate_kai_volt_celebrate",
+              "version": "celebrate",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_kai_volt_celebrate/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_kai_volt_celebrate/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_kai_volt_celebrate/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/celebrate/celebrate_kai_volt_celebrate.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/kai_volt/celebrate/kai_volt_celebrate_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "celebrate_kai_volt_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/celebrate/celebrate_kai_volt_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/kai_volt/celebrate/kai_volt_celebrate_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        },
+        {
+          "action_id": "idle",
+          "display_name": "待机",
+          "status": "active",
+          "design_text": "Guarded stance with controlled shoulder bounce and tiny hand adjustments.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "idle_kai_volt_idle",
+              "version": "idle",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_kai_volt_idle/preview.webp",
+              "cover": "assets/character-select-sequences/idle_kai_volt_idle/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_kai_volt_idle/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/idle/idle_kai_volt_idle.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/kai_volt/idle/kai_volt_idle_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "idle_kai_volt_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_kai_volt_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/idle_kai_volt_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_kai_volt_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/idle/idle_kai_volt_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/kai_volt/idle/kai_volt_idle_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "source": "character_manifest",
+      "sequence_count": 4,
+      "action_count": 2
+    },
+    {
+      "character_id": "lux_vale",
+      "display_name": "Lux Vale",
+      "short_label": "LUX",
+      "status": "active",
+      "role": "trick fighter",
+      "background": "",
+      "personality": "",
+      "preferences": "",
+      "action_style": "playful feints, elegant tricky timing, clean readable poses",
+      "persona_text": "Lux Vale is a stylish trick fighter whose actions should feel clever, theatrical, and still easy to read at sprite scale.",
+      "concept_art": {
+        "status": "reference",
+        "prompt": "",
+        "assets": [
+          {
+            "path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_10.png",
+            "role": "current character design reference",
+            "preview": "assets/character-pipeline/lux_vale/concept_00.webp"
+          }
+        ]
+      },
+      "standing_idle": {
+        "status": "needed",
+        "prompt": "",
+        "assets": []
+      },
+      "actions": [
+        {
+          "action_id": "celebrate",
+          "display_name": "选中庆祝",
+          "status": "active",
+          "design_text": "Small charismatic flourish, grounded and loop-safe.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "celebrate_lux_vale_celebrate",
+              "version": "celebrate",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_lux_vale_celebrate/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_lux_vale_celebrate/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_lux_vale_celebrate/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/celebrate/celebrate_lux_vale_celebrate.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/lux_vale/celebrate/lux_vale_celebrate_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "celebrate_lux_vale_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/celebrate/celebrate_lux_vale_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/lux_vale/celebrate/lux_vale_celebrate_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        },
+        {
+          "action_id": "idle",
+          "display_name": "待机",
+          "status": "active",
+          "design_text": "Relaxed guarded stance with a sly head angle and tiny hand reposition.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "idle_lux_vale_idle",
+              "version": "idle",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_lux_vale_idle/preview.webp",
+              "cover": "assets/character-select-sequences/idle_lux_vale_idle/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_lux_vale_idle/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/idle/idle_lux_vale_idle.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/lux_vale/idle/lux_vale_idle_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "idle_lux_vale_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_lux_vale_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/idle_lux_vale_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_lux_vale_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/idle/idle_lux_vale_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/lux_vale/idle/lux_vale_idle_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "source": "character_manifest",
+      "sequence_count": 4,
+      "action_count": 2
+    },
+    {
+      "character_id": "maya_comet",
+      "display_name": "Maya Comet",
+      "short_label": "MAYA",
+      "status": "active",
+      "role": "air fighter",
+      "background": "",
+      "personality": "",
+      "preferences": "",
+      "action_style": "light-footed aerial attitude, quick readable arcs, cheerful confidence",
+      "persona_text": "Maya Comet should feel springy and upbeat, with motion ideas that suggest air control while keeping sprite extraction stable.",
+      "concept_art": {
+        "status": "reference",
+        "prompt": "",
+        "assets": [
+          {
+            "path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_03.png",
+            "role": "current character design reference",
+            "preview": "assets/character-pipeline/maya_comet/concept_00.webp"
+          }
+        ]
+      },
+      "standing_idle": {
+        "status": "needed",
+        "prompt": "",
+        "assets": []
+      },
+      "actions": [
+        {
+          "action_id": "celebrate",
+          "display_name": "选中庆祝",
+          "status": "active",
+          "design_text": "Airy confidence gesture kept small enough for full-body framing.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "celebrate_maya_comet_celebrate",
+              "version": "celebrate",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_maya_comet_celebrate/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_maya_comet_celebrate/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_maya_comet_celebrate/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/celebrate/celebrate_maya_comet_celebrate.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/maya_comet/celebrate/maya_comet_celebrate_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "celebrate_maya_comet_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/celebrate/celebrate_maya_comet_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/maya_comet/celebrate/maya_comet_celebrate_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        },
+        {
+          "action_id": "idle",
+          "display_name": "待机",
+          "status": "active",
+          "design_text": "Light bounce, planted feet, breathing loop, no jump in idle.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "idle_maya_comet_idle",
+              "version": "idle",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_maya_comet_idle/preview.webp",
+              "cover": "assets/character-select-sequences/idle_maya_comet_idle/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_maya_comet_idle/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/idle/idle_maya_comet_idle.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/maya_comet/idle/maya_comet_idle_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "idle_maya_comet_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_maya_comet_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/idle_maya_comet_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_maya_comet_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/idle/idle_maya_comet_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/maya_comet/idle/maya_comet_idle_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "source": "character_manifest",
+      "sequence_count": 4,
+      "action_count": 2
+    },
+    {
+      "character_id": "nova_palm",
+      "display_name": "Nova Palm",
+      "short_label": "NOVA",
+      "status": "active",
+      "role": "guard fighter",
+      "background": "",
+      "personality": "",
+      "preferences": "",
+      "action_style": "grounded defense, open-palm guard, sturdy readable timing",
+      "persona_text": "Nova Palm is the grounded guard archetype, built around calm strength, planted feet, and strong readable hand shapes.",
+      "concept_art": {
+        "status": "reference",
+        "prompt": "",
+        "assets": [
+          {
+            "path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_08.png",
+            "role": "current character design reference",
+            "preview": "assets/character-pipeline/nova_palm/concept_00.webp"
+          }
+        ]
+      },
+      "standing_idle": {
+        "status": "needed",
+        "prompt": "",
+        "assets": []
+      },
+      "actions": [
+        {
+          "action_id": "celebrate",
+          "display_name": "选中庆祝",
+          "status": "active",
+          "design_text": "Calm confident selected pose with one compact hand or shoulder flourish.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "celebrate_nova_palm_celebrate",
+              "version": "celebrate",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_nova_palm_celebrate/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_nova_palm_celebrate/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_nova_palm_celebrate/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/celebrate/celebrate_nova_palm_celebrate.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/nova_palm/celebrate/nova_palm_celebrate_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "celebrate_nova_palm_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/celebrate/celebrate_nova_palm_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/nova_palm/celebrate/nova_palm_celebrate_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        },
+        {
+          "action_id": "idle",
+          "display_name": "待机",
+          "status": "active",
+          "design_text": "Stable guard stance, low center of gravity, subtle breath and palm tension.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "idle_nova_palm_idle",
+              "version": "idle",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_nova_palm_idle/preview.webp",
+              "cover": "assets/character-select-sequences/idle_nova_palm_idle/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_nova_palm_idle/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/idle/idle_nova_palm_idle.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/nova_palm/idle/nova_palm_idle_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "idle_nova_palm_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_nova_palm_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/idle_nova_palm_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_nova_palm_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/idle/idle_nova_palm_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/nova_palm/idle/nova_palm_idle_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "source": "character_manifest",
+      "sequence_count": 4,
+      "action_count": 2
+    },
+    {
+      "character_id": "rosa_rivet",
+      "display_name": "Rosa Rivet",
+      "short_label": "ROSA",
+      "status": "active",
+      "role": "grit fighter",
+      "background": "",
+      "personality": "",
+      "preferences": "",
+      "action_style": "tough brawler attitude, compact grit, confident grounded rhythm",
+      "persona_text": "Rosa Rivet should read as sturdy, expressive, and practical, with action ideas that show toughness without cluttering the silhouette.",
+      "concept_art": {
+        "status": "reference",
+        "prompt": "",
+        "assets": [
+          {
+            "path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_01.png",
+            "role": "current character design reference",
+            "preview": "assets/character-pipeline/rosa_rivet/concept_00.webp"
+          }
+        ]
+      },
+      "standing_idle": {
+        "status": "needed",
+        "prompt": "",
+        "assets": []
+      },
+      "actions": [
+        {
+          "action_id": "celebrate",
+          "display_name": "选中庆祝",
+          "status": "active",
+          "design_text": "Short grounded gritty flourish with a held confident selection pose.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "celebrate_rosa_rivet_celebrate",
+              "version": "celebrate",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/celebrate/celebrate_rosa_rivet_celebrate.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/rosa_rivet/celebrate/rosa_rivet_celebrate_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "celebrate_rosa_rivet_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "celebrate",
+              "preview": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/celebrate/celebrate_rosa_rivet_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/rosa_rivet/celebrate/rosa_rivet_celebrate_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        },
+        {
+          "action_id": "idle",
+          "display_name": "待机",
+          "status": "active",
+          "design_text": "Compact tough stance, shoulders settle, hands stay readable near torso.",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "idle_rosa_rivet_idle",
+              "version": "idle",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_rosa_rivet_idle/preview.webp",
+              "cover": "assets/character-select-sequences/idle_rosa_rivet_idle/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_rosa_rivet_idle/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/idle/idle_rosa_rivet_idle.json",
+              "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/rosa_rivet/idle/rosa_rivet_idle_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 6,
+              "loop_end": 60
+            },
+            {
+              "sequence_id": "idle_rosa_rivet_local_fresh",
+              "version": "local_procedural_fresh",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/preview.webp",
+              "cover": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/idle/idle_rosa_rivet_local_fresh.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/rosa_rivet/idle/rosa_rivet_idle_local_fresh.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        }
+      ],
+      "notes": "",
+      "source": "character_manifest",
+      "sequence_count": 4,
+      "action_count": 2
+    },
+    {
+      "character_id": "seedance_artdoc_probe",
+      "display_name": "Seedance_Art_Doc_Probe",
+      "short_label": "",
+      "status": "draft",
+      "role": "",
+      "background": "",
+      "personality": "",
+      "preferences": "",
+      "action_style": "",
+      "persona_text": "",
+      "concept_art": {
+        "status": "needed",
+        "prompt": "",
+        "assets": []
+      },
+      "standing_idle": {
+        "status": "needed",
+        "prompt": "",
+        "assets": []
+      },
+      "actions": [
+        {
+          "action_id": "idle",
+          "display_name": "待机",
+          "status": "active",
+          "design_text": "",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "idle_seedance_artdoc_probe_artdoc_v1",
+              "version": "ark_seedance_2_0_fast",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/preview.webp",
+              "cover": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/seedance_artdoc_probe/idle/idle_seedance_artdoc_probe_artdoc_v1.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/seedance_artdoc_probe/idle/seedance_artdoc_probe_idle_artdoc_v1.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        }
+      ],
+      "notes": "Derived from published sequence metadata.",
+      "source": "sequence_manifest",
+      "sequence_count": 1,
+      "action_count": 1
+    },
+    {
+      "character_id": "seedance_probe",
+      "display_name": "Seedance Probe",
+      "short_label": "",
+      "status": "draft",
+      "role": "",
+      "background": "",
+      "personality": "",
+      "preferences": "",
+      "action_style": "",
+      "persona_text": "",
+      "concept_art": {
+        "status": "needed",
+        "prompt": "",
+        "assets": []
+      },
+      "standing_idle": {
+        "status": "needed",
+        "prompt": "",
+        "assets": []
+      },
+      "actions": [
+        {
+          "action_id": "idle",
+          "display_name": "待机",
+          "status": "active",
+          "design_text": "",
+          "seedance_prompt": "",
+          "current_sequence_id": "",
+          "notes": "",
+          "sequences": [
+            {
+              "sequence_id": "idle_seedance_probe_seedance",
+              "version": "ark_seedance_2_0_fast",
+              "action": "idle",
+              "preview": "assets/character-select-sequences/idle_seedance_probe_seedance/preview.webp",
+              "cover": "assets/character-select-sequences/idle_seedance_probe_seedance/cover.webp",
+              "sheet": "assets/character-select-sequences/idle_seedance_probe_seedance/sheet.webp",
+              "metadata_path": "assets/generated/processed/character_select_sequences/seedance_probe/idle/idle_seedance_probe_seedance.json",
+              "source_video_path": "assets/generated/raw/character_select_sequences/seedance_probe/idle/seedance_probe_idle_seedance.mp4",
+              "frame_count": 54,
+              "playback_fps": 12.0,
+              "loop_start": 0,
+              "loop_end": 54
+            }
+          ]
+        }
+      ],
+      "notes": "Derived from published sequence metadata.",
+      "source": "sequence_manifest",
+      "sequence_count": 1,
+      "action_count": 1
+    }
+  ]
+}

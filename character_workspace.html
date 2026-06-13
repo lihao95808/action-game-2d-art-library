@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Action Game 2D 人物工作台</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0d1320;
+      --panel: #151f2f;
+      --panel2: #1c2a3f;
+      --panel3: #22324a;
+      --line: #304764;
+      --text: #eef4ff;
+      --muted: #aebdd2;
+      --accent: #ffd166;
+      --good: #43d17a;
+      --bad: #ff6b6b;
+      --blue: #65b8ff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Microsoft YaHei", "Segoe UI", Arial, sans-serif; background: var(--bg); color: var(--text); }
+    button, input, select, textarea {
+      font: inherit;
+      color: var(--text);
+      background: #0f1726;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      min-height: 44px;
+    }
+    button { cursor: pointer; padding: 8px 12px; }
+    button.primary { background: #315f95; border-color: var(--blue); }
+    button.good { background: #1d6d49; border-color: var(--good); }
+    button.warn { background: #68422a; border-color: #ffab6f; }
+    input, select, textarea { width: 100%; padding: 9px 10px; }
+    textarea { resize: vertical; min-height: 96px; line-height: 1.55; }
+    a { color: var(--blue); }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(13, 19, 32, .96);
+      border-bottom: 1px solid var(--line);
+      padding: 14px clamp(14px, 3vw, 28px);
+      display: grid;
+      gap: 12px;
+    }
+    .title-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    h1 { margin: 0; font-size: clamp(22px, 4vw, 32px); letter-spacing: 0; }
+    .summary { color: var(--muted); line-height: 1.55; max-width: 960px; }
+    .nav { display: flex; gap: 8px; flex-wrap: wrap; }
+    .nav a, .nav button { text-decoration: none; color: var(--text); background: var(--panel2); border: 1px solid var(--line); border-radius: 8px; min-height: 40px; padding: 8px 11px; }
+    .cloud {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr .8fr 1.4fr auto auto auto auto;
+      gap: 8px;
+      align-items: end;
+    }
+    .cloud label { display: grid; gap: 4px; color: var(--muted); font-size: 12px; }
+    .status-line { color: var(--muted); font-size: 13px; min-height: 20px; }
+    .layout {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr) 320px;
+      min-height: calc(100vh - 178px);
+    }
+    aside, .right-rail { border-right: 1px solid var(--line); background: #101827; padding: 14px; overflow: auto; }
+    .right-rail { border-right: 0; border-left: 1px solid var(--line); }
+    main { min-width: 0; padding: 16px; display: grid; gap: 14px; align-content: start; }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .panel h2, .panel h3 { margin: 0 0 10px; letter-spacing: 0; }
+    .panel h2 { font-size: 22px; }
+    .panel h3 { font-size: 16px; }
+    .muted { color: var(--muted); }
+    .search-row { display: grid; gap: 8px; margin-bottom: 10px; }
+    .character-list { display: grid; gap: 8px; }
+    .character-card {
+      width: 100%;
+      text-align: left;
+      display: grid;
+      gap: 5px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .character-card.active { border-color: var(--blue); background: #1b3350; }
+    .character-card.archived { opacity: .55; }
+    .pill-row, .action-row, .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .pill { display: inline-flex; align-items: center; min-height: 28px; padding: 4px 8px; border-radius: 999px; background: #263a55; color: var(--muted); font-size: 12px; }
+    .pill.good { color: #061b10; background: var(--good); }
+    .pill.warn { color: #201000; background: var(--accent); }
+    .stage-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .stage-tabs button.active { background: #315f95; border-color: var(--blue); }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .field { display: grid; gap: 5px; }
+    .field span { color: var(--muted); font-size: 12px; }
+    .slot-assets, .sequence-grid, .job-list, .action-list { display: grid; gap: 10px; }
+    .asset-card, .sequence-card, .job-card, .action-card {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.03);
+      border-radius: 8px;
+      padding: 10px;
+      display: grid;
+      gap: 8px;
+    }
+    .asset-card img, .sequence-card img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      background: #0b1220;
+      border: 1px solid #24344d;
+      border-radius: 8px;
+    }
+    .action-card.active { border-color: var(--blue); background: #1b3350; }
+    .empty { color: var(--muted); line-height: 1.7; }
+    .small { font-size: 12px; color: var(--muted); line-height: 1.45; overflow-wrap: anywhere; }
+    .danger-text { color: var(--bad); }
+    .file-input { display: none; }
+    @media (max-width: 1120px) {
+      .layout { grid-template-columns: 260px minmax(0, 1fr); }
+      .right-rail { grid-column: 1 / -1; border-left: 0; border-top: 1px solid var(--line); }
+      .cloud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 760px) {
+      header { position: static; }
+      .layout { grid-template-columns: 1fr; }
+      aside, .right-rail { border: 0; border-bottom: 1px solid var(--line); }
+      .grid-2, .grid-3, .cloud { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title-row">
+      <div>
+        <h1>人物工作台</h1>
+        <div class="summary">以人物为源头管理背景、人设、动作表、当前动作、Seedance 请求和序列帧结果。网页只保存草稿和任务队列，不直接调用 GPT Image 或 Seedance。</div>
+      </div>
+      <div class="nav">
+        <a href="index.html#ui-review">UI 风格</a>
+        <a href="image_review.html">图片评审</a>
+        <a href="sequences.html">序列帧审片</a>
+        <button id="exportWorkspace">导出 JSON</button>
+        <button id="importWorkspace">导入 JSON</button>
+        <input id="workspaceFile" class="file-input" type="file" accept="application/json">
+      </div>
+    </div>
+    <div class="cloud">
+      <label>GitHub 仓库<input id="cloudRepo" value="lihao95808/action-game-2d-art-library"></label>
+      <label>分支<input id="cloudBranch" value="main"></label>
+      <label>操作者<input id="cloudReviewer" value="duzuguang"></label>
+      <label>GitHub token<input id="cloudToken" type="password" autocomplete="off" placeholder="只保存在本浏览器"></label>
+      <button id="saveCloudSettings">保存设置</button>
+      <button id="pullCloud">拉取云端</button>
+      <button id="pushCloud">同步草稿/队列</button>
+      <button id="clearCloudToken">清除 token</button>
+    </div>
+    <div class="status-line" id="syncStatus"></div>
+  </header>
+  <div class="layout">
+    <aside>
+      <div class="search-row">
+        <input id="characterSearch" placeholder="搜索人物 / 流派 / 备注">
+        <select id="statusFilter">
+          <option value="all">全部状态</option>
+          <option value="active">active</option>
+          <option value="draft">draft</option>
+          <option value="archived">archived</option>
+        </select>
+        <button class="primary" id="addCharacter">新增人物</button>
+      </div>
+      <div class="character-list" id="characterList"></div>
+    </aside>
+    <main>
+      <div class="panel">
+        <div class="stage-tabs" id="stageTabs"></div>
+      </div>
+      <div id="stagePanel"></div>
+    </main>
+    <section class="right-rail">
+      <div id="focusPanel"></div>
+    </section>
+  </div>
+  <script>
+    const sourceCharacters = [{"character_id": "juno_kick", "display_name": "Juno Kick", "short_label": "JUNO", "status": "active", "role": "rush fighter", "background": "", "personality": "", "preferences": "", "action_style": "fast close-range kicking rhythm, upbeat arcade confidence", "persona_text": "Juno Kick is a compact sunny arcade brawler hero built around quick footwork, readable kicks, and confident selection-screen energy.", "concept_art": {"status": "reference", "prompt": "", "assets": [{"path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_09.png", "role": "current character design reference", "preview": "assets/character-pipeline/juno_kick/concept_00.webp"}]}, "standing_idle": {"status": "needed", "prompt": "", "assets": []}, "actions": [{"action_id": "celebrate", "display_name": "选中庆祝", "status": "active", "design_text": "Small grounded selected-hero flourish that returns near the ready stance.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "celebrate_juno_kick_celebrate", "version": "celebrate", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_juno_kick_celebrate/preview.webp", "cover": "assets/character-select-sequences/celebrate_juno_kick_celebrate/cover.webp", "sheet": "assets/character-select-sequences/celebrate_juno_kick_celebrate/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/celebrate/celebrate_juno_kick_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/juno_kick/celebrate/juno_kick_celebrate_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "celebrate_juno_kick_local_fresh", "version": "local_procedural_fresh", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/preview.webp", "cover": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/celebrate/celebrate_juno_kick_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/juno_kick/celebrate/juno_kick_celebrate_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}, {"action_id": "idle", "display_name": "待机", "status": "active", "design_text": "Compact combat guard, planted feet, subtle breathing and small weight shifts.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "idle_juno_kick_idle", "version": "idle", "action": "idle", "preview": "assets/character-select-sequences/idle_juno_kick_idle/preview.webp", "cover": "assets/character-select-sequences/idle_juno_kick_idle/cover.webp", "sheet": "assets/character-select-sequences/idle_juno_kick_idle/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/idle/idle_juno_kick_idle.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/juno_kick/idle/juno_kick_idle_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "idle_juno_kick_local_fresh", "version": "local_procedural_fresh", "action": "idle", "preview": "assets/character-select-sequences/idle_juno_kick_local_fresh/preview.webp", "cover": "assets/character-select-sequences/idle_juno_kick_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/idle_juno_kick_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/idle/idle_juno_kick_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/juno_kick/idle/juno_kick_idle_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}], "notes": "", "source": "character_manifest", "sequence_count": 4, "action_count": 2}, {"character_id": "kai_volt", "display_name": "Kai Volt", "short_label": "KAI", "status": "active", "role": "electric striker", "background": "", "personality": "", "preferences": "", "action_style": "sharp rhythm, electric confidence, compact striker poses", "persona_text": "Kai Volt reads as a bright arcade striker with snappy timing and clean, energetic silhouettes.", "concept_art": {"status": "reference", "prompt": "", "assets": [{"path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_05.png", "role": "current character design reference", "preview": "assets/character-pipeline/kai_volt/concept_00.webp"}]}, "standing_idle": {"status": "needed", "prompt": "", "assets": []}, "actions": [{"action_id": "celebrate", "display_name": "选中庆祝", "status": "active", "design_text": "Brief confident spark-like pose language without VFX in the sprite pass.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "celebrate_kai_volt_celebrate", "version": "celebrate", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_kai_volt_celebrate/preview.webp", "cover": "assets/character-select-sequences/celebrate_kai_volt_celebrate/cover.webp", "sheet": "assets/character-select-sequences/celebrate_kai_volt_celebrate/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/celebrate/celebrate_kai_volt_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/kai_volt/celebrate/kai_volt_celebrate_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "celebrate_kai_volt_local_fresh", "version": "local_procedural_fresh", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/preview.webp", "cover": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/celebrate/celebrate_kai_volt_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/kai_volt/celebrate/kai_volt_celebrate_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}, {"action_id": "idle", "display_name": "待机", "status": "active", "design_text": "Guarded stance with controlled shoulder bounce and tiny hand adjustments.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "idle_kai_volt_idle", "version": "idle", "action": "idle", "preview": "assets/character-select-sequences/idle_kai_volt_idle/preview.webp", "cover": "assets/character-select-sequences/idle_kai_volt_idle/cover.webp", "sheet": "assets/character-select-sequences/idle_kai_volt_idle/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/idle/idle_kai_volt_idle.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/kai_volt/idle/kai_volt_idle_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "idle_kai_volt_local_fresh", "version": "local_procedural_fresh", "action": "idle", "preview": "assets/character-select-sequences/idle_kai_volt_local_fresh/preview.webp", "cover": "assets/character-select-sequences/idle_kai_volt_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/idle_kai_volt_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/idle/idle_kai_volt_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/kai_volt/idle/kai_volt_idle_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}], "notes": "", "source": "character_manifest", "sequence_count": 4, "action_count": 2}, {"character_id": "lux_vale", "display_name": "Lux Vale", "short_label": "LUX", "status": "active", "role": "trick fighter", "background": "", "personality": "", "preferences": "", "action_style": "playful feints, elegant tricky timing, clean readable poses", "persona_text": "Lux Vale is a stylish trick fighter whose actions should feel clever, theatrical, and still easy to read at sprite scale.", "concept_art": {"status": "reference", "prompt": "", "assets": [{"path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_10.png", "role": "current character design reference", "preview": "assets/character-pipeline/lux_vale/concept_00.webp"}]}, "standing_idle": {"status": "needed", "prompt": "", "assets": []}, "actions": [{"action_id": "celebrate", "display_name": "选中庆祝", "status": "active", "design_text": "Small charismatic flourish, grounded and loop-safe.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "celebrate_lux_vale_celebrate", "version": "celebrate", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_lux_vale_celebrate/preview.webp", "cover": "assets/character-select-sequences/celebrate_lux_vale_celebrate/cover.webp", "sheet": "assets/character-select-sequences/celebrate_lux_vale_celebrate/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/celebrate/celebrate_lux_vale_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/lux_vale/celebrate/lux_vale_celebrate_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "celebrate_lux_vale_local_fresh", "version": "local_procedural_fresh", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/preview.webp", "cover": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/celebrate/celebrate_lux_vale_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/lux_vale/celebrate/lux_vale_celebrate_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}, {"action_id": "idle", "display_name": "待机", "status": "active", "design_text": "Relaxed guarded stance with a sly head angle and tiny hand reposition.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "idle_lux_vale_idle", "version": "idle", "action": "idle", "preview": "assets/character-select-sequences/idle_lux_vale_idle/preview.webp", "cover": "assets/character-select-sequences/idle_lux_vale_idle/cover.webp", "sheet": "assets/character-select-sequences/idle_lux_vale_idle/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/idle/idle_lux_vale_idle.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/lux_vale/idle/lux_vale_idle_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "idle_lux_vale_local_fresh", "version": "local_procedural_fresh", "action": "idle", "preview": "assets/character-select-sequences/idle_lux_vale_local_fresh/preview.webp", "cover": "assets/character-select-sequences/idle_lux_vale_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/idle_lux_vale_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/idle/idle_lux_vale_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/lux_vale/idle/lux_vale_idle_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}], "notes": "", "source": "character_manifest", "sequence_count": 4, "action_count": 2}, {"character_id": "maya_comet", "display_name": "Maya Comet", "short_label": "MAYA", "status": "active", "role": "air fighter", "background": "", "personality": "", "preferences": "", "action_style": "light-footed aerial attitude, quick readable arcs, cheerful confidence", "persona_text": "Maya Comet should feel springy and upbeat, with motion ideas that suggest air control while keeping sprite extraction stable.", "concept_art": {"status": "reference", "prompt": "", "assets": [{"path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_03.png", "role": "current character design reference", "preview": "assets/character-pipeline/maya_comet/concept_00.webp"}]}, "standing_idle": {"status": "needed", "prompt": "", "assets": []}, "actions": [{"action_id": "celebrate", "display_name": "选中庆祝", "status": "active", "design_text": "Airy confidence gesture kept small enough for full-body framing.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "celebrate_maya_comet_celebrate", "version": "celebrate", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_maya_comet_celebrate/preview.webp", "cover": "assets/character-select-sequences/celebrate_maya_comet_celebrate/cover.webp", "sheet": "assets/character-select-sequences/celebrate_maya_comet_celebrate/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/celebrate/celebrate_maya_comet_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/maya_comet/celebrate/maya_comet_celebrate_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "celebrate_maya_comet_local_fresh", "version": "local_procedural_fresh", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/preview.webp", "cover": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/celebrate/celebrate_maya_comet_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/maya_comet/celebrate/maya_comet_celebrate_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}, {"action_id": "idle", "display_name": "待机", "status": "active", "design_text": "Light bounce, planted feet, breathing loop, no jump in idle.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "idle_maya_comet_idle", "version": "idle", "action": "idle", "preview": "assets/character-select-sequences/idle_maya_comet_idle/preview.webp", "cover": "assets/character-select-sequences/idle_maya_comet_idle/cover.webp", "sheet": "assets/character-select-sequences/idle_maya_comet_idle/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/idle/idle_maya_comet_idle.json", "source_video_path": "assets/generated/raw/character_select_sequences/maya_comet/idle/maya_comet_idle_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "idle_maya_comet_local_fresh", "version": "local_procedural_fresh", "action": "idle", "preview": "assets/character-select-sequences/idle_maya_comet_local_fresh/preview.webp", "cover": "assets/character-select-sequences/idle_maya_comet_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/idle_maya_comet_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/idle/idle_maya_comet_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/maya_comet/idle/maya_comet_idle_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}], "notes": "", "source": "character_manifest", "sequence_count": 4, "action_count": 2}, {"character_id": "nova_palm", "display_name": "Nova Palm", "short_label": "NOVA", "status": "active", "role": "guard fighter", "background": "", "personality": "", "preferences": "", "action_style": "grounded defense, open-palm guard, sturdy readable timing", "persona_text": "Nova Palm is the grounded guard archetype, built around calm strength, planted feet, and strong readable hand shapes.", "concept_art": {"status": "reference", "prompt": "", "assets": [{"path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_08.png", "role": "current character design reference", "preview": "assets/character-pipeline/nova_palm/concept_00.webp"}]}, "standing_idle": {"status": "needed", "prompt": "", "assets": []}, "actions": [{"action_id": "celebrate", "display_name": "选中庆祝", "status": "active", "design_text": "Calm confident selected pose with one compact hand or shoulder flourish.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "celebrate_nova_palm_celebrate", "version": "celebrate", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_nova_palm_celebrate/preview.webp", "cover": "assets/character-select-sequences/celebrate_nova_palm_celebrate/cover.webp", "sheet": "assets/character-select-sequences/celebrate_nova_palm_celebrate/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/celebrate/celebrate_nova_palm_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/nova_palm/celebrate/nova_palm_celebrate_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "celebrate_nova_palm_local_fresh", "version": "local_procedural_fresh", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/preview.webp", "cover": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/celebrate/celebrate_nova_palm_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/nova_palm/celebrate/nova_palm_celebrate_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}, {"action_id": "idle", "display_name": "待机", "status": "active", "design_text": "Stable guard stance, low center of gravity, subtle breath and palm tension.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "idle_nova_palm_idle", "version": "idle", "action": "idle", "preview": "assets/character-select-sequences/idle_nova_palm_idle/preview.webp", "cover": "assets/character-select-sequences/idle_nova_palm_idle/cover.webp", "sheet": "assets/character-select-sequences/idle_nova_palm_idle/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/idle/idle_nova_palm_idle.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/nova_palm/idle/nova_palm_idle_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "idle_nova_palm_local_fresh", "version": "local_procedural_fresh", "action": "idle", "preview": "assets/character-select-sequences/idle_nova_palm_local_fresh/preview.webp", "cover": "assets/character-select-sequences/idle_nova_palm_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/idle_nova_palm_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/idle/idle_nova_palm_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/nova_palm/idle/nova_palm_idle_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}], "notes": "", "source": "character_manifest", "sequence_count": 4, "action_count": 2}, {"character_id": "rosa_rivet", "display_name": "Rosa Rivet", "short_label": "ROSA", "status": "active", "role": "grit fighter", "background": "", "personality": "", "preferences": "", "action_style": "tough brawler attitude, compact grit, confident grounded rhythm", "persona_text": "Rosa Rivet should read as sturdy, expressive, and practical, with action ideas that show toughness without cluttering the silhouette.", "concept_art": {"status": "reference", "prompt": "", "assets": [{"path": "assets/art_references/mature_female_batch_03_rich_designs/rich_design_female_01.png", "role": "current character design reference", "preview": "assets/character-pipeline/rosa_rivet/concept_00.webp"}]}, "standing_idle": {"status": "needed", "prompt": "", "assets": []}, "actions": [{"action_id": "celebrate", "display_name": "选中庆祝", "status": "active", "design_text": "Short grounded gritty flourish with a held confident selection pose.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "celebrate_rosa_rivet_celebrate", "version": "celebrate", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/preview.webp", "cover": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/cover.webp", "sheet": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/celebrate/celebrate_rosa_rivet_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/rosa_rivet/celebrate/rosa_rivet_celebrate_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "celebrate_rosa_rivet_local_fresh", "version": "local_procedural_fresh", "action": "celebrate", "preview": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/preview.webp", "cover": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/celebrate/celebrate_rosa_rivet_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/rosa_rivet/celebrate/rosa_rivet_celebrate_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}, {"action_id": "idle", "display_name": "待机", "status": "active", "design_text": "Compact tough stance, shoulders settle, hands stay readable near torso.", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "idle_rosa_rivet_idle", "version": "idle", "action": "idle", "preview": "assets/character-select-sequences/idle_rosa_rivet_idle/preview.webp", "cover": "assets/character-select-sequences/idle_rosa_rivet_idle/cover.webp", "sheet": "assets/character-select-sequences/idle_rosa_rivet_idle/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/idle/idle_rosa_rivet_idle.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/rosa_rivet/idle/rosa_rivet_idle_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60}, {"sequence_id": "idle_rosa_rivet_local_fresh", "version": "local_procedural_fresh", "action": "idle", "preview": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/preview.webp", "cover": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/cover.webp", "sheet": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/idle/idle_rosa_rivet_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/rosa_rivet/idle/rosa_rivet_idle_local_fresh.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}], "notes": "", "source": "character_manifest", "sequence_count": 4, "action_count": 2}, {"character_id": "seedance_artdoc_probe", "display_name": "Seedance_Art_Doc_Probe", "short_label": "", "status": "draft", "role": "", "background": "", "personality": "", "preferences": "", "action_style": "", "persona_text": "", "concept_art": {"status": "needed", "prompt": "", "assets": []}, "standing_idle": {"status": "needed", "prompt": "", "assets": []}, "actions": [{"action_id": "idle", "display_name": "待机", "status": "active", "design_text": "", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "idle_seedance_artdoc_probe_artdoc_v1", "version": "ark_seedance_2_0_fast", "action": "idle", "preview": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/preview.webp", "cover": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/cover.webp", "sheet": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/seedance_artdoc_probe/idle/idle_seedance_artdoc_probe_artdoc_v1.json", "source_video_path": "assets/generated/raw/character_select_sequences/seedance_artdoc_probe/idle/seedance_artdoc_probe_idle_artdoc_v1.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}], "notes": "Derived from published sequence metadata.", "source": "sequence_manifest", "sequence_count": 1, "action_count": 1}, {"character_id": "seedance_probe", "display_name": "Seedance Probe", "short_label": "", "status": "draft", "role": "", "background": "", "personality": "", "preferences": "", "action_style": "", "persona_text": "", "concept_art": {"status": "needed", "prompt": "", "assets": []}, "standing_idle": {"status": "needed", "prompt": "", "assets": []}, "actions": [{"action_id": "idle", "display_name": "待机", "status": "active", "design_text": "", "seedance_prompt": "", "current_sequence_id": "", "notes": "", "sequences": [{"sequence_id": "idle_seedance_probe_seedance", "version": "ark_seedance_2_0_fast", "action": "idle", "preview": "assets/character-select-sequences/idle_seedance_probe_seedance/preview.webp", "cover": "assets/character-select-sequences/idle_seedance_probe_seedance/cover.webp", "sheet": "assets/character-select-sequences/idle_seedance_probe_seedance/sheet.webp", "metadata_path": "assets/generated/processed/character_select_sequences/seedance_probe/idle/idle_seedance_probe_seedance.json", "source_video_path": "assets/generated/raw/character_select_sequences/seedance_probe/idle/seedance_probe_idle_seedance.mp4", "frame_count": 54, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54}]}], "notes": "Derived from published sequence metadata.", "source": "sequence_manifest", "sequence_count": 1, "action_count": 1}];
+    const sourceSequences = [{"sequence_id": "celebrate_juno_kick_celebrate", "character_id": "juno_kick", "character_label": "Juno Kick", "action": "celebrate", "action_label": "选中庆祝", "version": "celebrate", "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/celebrate/celebrate_juno_kick_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/juno_kick/celebrate/juno_kick_celebrate_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_juno_kick_celebrate/preview.webp", "sheet": "assets/character-select-sequences/celebrate_juno_kick_celebrate/sheet.webp", "cover": "assets/character-select-sequences/celebrate_juno_kick_celebrate/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_000.webp", "size": [140, 160], "bytes": 7282}, {"index": 5, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_005.webp", "size": [140, 160], "bytes": 6676}, {"index": 10, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_010.webp", "size": [140, 160], "bytes": 7392}, {"index": 14, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_014.webp", "size": [140, 160], "bytes": 7574}, {"index": 19, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_019.webp", "size": [140, 160], "bytes": 6758}, {"index": 24, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_024.webp", "size": [140, 160], "bytes": 6782}, {"index": 29, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_029.webp", "size": [140, 160], "bytes": 6896}, {"index": 34, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_034.webp", "size": [140, 160], "bytes": 6964}, {"index": 39, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_039.webp", "size": [140, 160], "bytes": 7254}, {"index": 43, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_043.webp", "size": [140, 160], "bytes": 7142}, {"index": 48, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_048.webp", "size": [140, 160], "bytes": 7152}, {"index": 53, "path": "assets/character-select-sequences/celebrate_juno_kick_celebrate/frames/frame_053.webp", "size": [140, 160], "bytes": 7180}], "preview_bytes": 634298, "sheet_bytes": 329212}, {"sequence_id": "celebrate_juno_kick_local_fresh", "character_id": "juno_kick", "character_label": "Juno Kick", "action": "celebrate", "action_label": "选中庆祝", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/celebrate/celebrate_juno_kick_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/juno_kick/celebrate/juno_kick_celebrate_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 7282}, {"index": 5, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6676}, {"index": 10, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 7392}, {"index": 14, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 7574}, {"index": 19, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6758}, {"index": 24, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 6782}, {"index": 29, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6896}, {"index": 34, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6964}, {"index": 39, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 7254}, {"index": 43, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 7142}, {"index": 48, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 7152}, {"index": 53, "path": "assets/character-select-sequences/celebrate_juno_kick_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 7180}], "preview_bytes": 634298, "sheet_bytes": 329212}, {"sequence_id": "idle_juno_kick_idle", "character_id": "juno_kick", "character_label": "Juno Kick", "action": "idle", "action_label": "待机", "version": "idle", "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/idle/idle_juno_kick_idle.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/juno_kick/idle/juno_kick_idle_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_juno_kick_idle/preview.webp", "sheet": "assets/character-select-sequences/idle_juno_kick_idle/sheet.webp", "cover": "assets/character-select-sequences/idle_juno_kick_idle/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_000.webp", "size": [140, 160], "bytes": 6444}, {"index": 5, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_005.webp", "size": [140, 160], "bytes": 6184}, {"index": 10, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_010.webp", "size": [140, 160], "bytes": 6500}, {"index": 14, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_014.webp", "size": [140, 160], "bytes": 6262}, {"index": 19, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_019.webp", "size": [140, 160], "bytes": 6190}, {"index": 24, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_024.webp", "size": [140, 160], "bytes": 6464}, {"index": 29, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_029.webp", "size": [140, 160], "bytes": 6262}, {"index": 34, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_034.webp", "size": [140, 160], "bytes": 6352}, {"index": 39, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_039.webp", "size": [140, 160], "bytes": 6410}, {"index": 43, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_043.webp", "size": [140, 160], "bytes": 6362}, {"index": 48, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_048.webp", "size": [140, 160], "bytes": 6150}, {"index": 53, "path": "assets/character-select-sequences/idle_juno_kick_idle/frames/frame_053.webp", "size": [140, 160], "bytes": 6426}], "preview_bytes": 567252, "sheet_bytes": 283828}, {"sequence_id": "idle_juno_kick_local_fresh", "character_id": "juno_kick", "character_label": "Juno Kick", "action": "idle", "action_label": "待机", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/juno_kick/idle/idle_juno_kick_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/juno_kick/idle/juno_kick_idle_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_juno_kick_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/idle_juno_kick_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/idle_juno_kick_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6444}, {"index": 5, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6184}, {"index": 10, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6500}, {"index": 14, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 6262}, {"index": 19, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6190}, {"index": 24, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 6464}, {"index": 29, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6262}, {"index": 34, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6352}, {"index": 39, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 6410}, {"index": 43, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6362}, {"index": 48, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 6150}, {"index": 53, "path": "assets/character-select-sequences/idle_juno_kick_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 6426}], "preview_bytes": 567252, "sheet_bytes": 283828}, {"sequence_id": "celebrate_kai_volt_celebrate", "character_id": "kai_volt", "character_label": "Kai Volt", "action": "celebrate", "action_label": "选中庆祝", "version": "celebrate", "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/celebrate/celebrate_kai_volt_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/kai_volt/celebrate/kai_volt_celebrate_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_kai_volt_celebrate/preview.webp", "sheet": "assets/character-select-sequences/celebrate_kai_volt_celebrate/sheet.webp", "cover": "assets/character-select-sequences/celebrate_kai_volt_celebrate/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_000.webp", "size": [140, 160], "bytes": 6098}, {"index": 5, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_005.webp", "size": [140, 160], "bytes": 6528}, {"index": 10, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_010.webp", "size": [140, 160], "bytes": 6616}, {"index": 14, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_014.webp", "size": [140, 160], "bytes": 6148}, {"index": 19, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_019.webp", "size": [140, 160], "bytes": 6052}, {"index": 24, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_024.webp", "size": [140, 160], "bytes": 5202}, {"index": 29, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_029.webp", "size": [140, 160], "bytes": 6616}, {"index": 34, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_034.webp", "size": [140, 160], "bytes": 6390}, {"index": 39, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_039.webp", "size": [140, 160], "bytes": 6516}, {"index": 43, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_043.webp", "size": [140, 160], "bytes": 6580}, {"index": 48, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_048.webp", "size": [140, 160], "bytes": 6358}, {"index": 53, "path": "assets/character-select-sequences/celebrate_kai_volt_celebrate/frames/frame_053.webp", "size": [140, 160], "bytes": 6492}], "preview_bytes": 575078, "sheet_bytes": 259140}, {"sequence_id": "celebrate_kai_volt_local_fresh", "character_id": "kai_volt", "character_label": "Kai Volt", "action": "celebrate", "action_label": "选中庆祝", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/celebrate/celebrate_kai_volt_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/kai_volt/celebrate/kai_volt_celebrate_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6098}, {"index": 5, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6528}, {"index": 10, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6616}, {"index": 14, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 6148}, {"index": 19, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6052}, {"index": 24, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 5202}, {"index": 29, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6616}, {"index": 34, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6390}, {"index": 39, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 6516}, {"index": 43, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6580}, {"index": 48, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 6358}, {"index": 53, "path": "assets/character-select-sequences/celebrate_kai_volt_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 6492}], "preview_bytes": 575078, "sheet_bytes": 259140}, {"sequence_id": "idle_kai_volt_idle", "character_id": "kai_volt", "character_label": "Kai Volt", "action": "idle", "action_label": "待机", "version": "idle", "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/idle/idle_kai_volt_idle.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/kai_volt/idle/kai_volt_idle_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_kai_volt_idle/preview.webp", "sheet": "assets/character-select-sequences/idle_kai_volt_idle/sheet.webp", "cover": "assets/character-select-sequences/idle_kai_volt_idle/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_000.webp", "size": [140, 160], "bytes": 6280}, {"index": 5, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_005.webp", "size": [140, 160], "bytes": 6318}, {"index": 10, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_010.webp", "size": [140, 160], "bytes": 6252}, {"index": 14, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_014.webp", "size": [140, 160], "bytes": 6318}, {"index": 19, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_019.webp", "size": [140, 160], "bytes": 6440}, {"index": 24, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_024.webp", "size": [140, 160], "bytes": 6288}, {"index": 29, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_029.webp", "size": [140, 160], "bytes": 6480}, {"index": 34, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_034.webp", "size": [140, 160], "bytes": 6260}, {"index": 39, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_039.webp", "size": [140, 160], "bytes": 6364}, {"index": 43, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_043.webp", "size": [140, 160], "bytes": 6502}, {"index": 48, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_048.webp", "size": [140, 160], "bytes": 6306}, {"index": 53, "path": "assets/character-select-sequences/idle_kai_volt_idle/frames/frame_053.webp", "size": [140, 160], "bytes": 6284}], "preview_bytes": 577184, "sheet_bytes": 262040}, {"sequence_id": "idle_kai_volt_local_fresh", "character_id": "kai_volt", "character_label": "Kai Volt", "action": "idle", "action_label": "待机", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/kai_volt/idle/idle_kai_volt_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/kai_volt/idle/kai_volt_idle_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_kai_volt_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/idle_kai_volt_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/idle_kai_volt_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6280}, {"index": 5, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6318}, {"index": 10, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6252}, {"index": 14, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 6318}, {"index": 19, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6440}, {"index": 24, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 6288}, {"index": 29, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6480}, {"index": 34, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6260}, {"index": 39, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 6364}, {"index": 43, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6502}, {"index": 48, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 6306}, {"index": 53, "path": "assets/character-select-sequences/idle_kai_volt_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 6284}], "preview_bytes": 577184, "sheet_bytes": 262040}, {"sequence_id": "celebrate_lux_vale_celebrate", "character_id": "lux_vale", "character_label": "Lux Vale", "action": "celebrate", "action_label": "选中庆祝", "version": "celebrate", "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/celebrate/celebrate_lux_vale_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/lux_vale/celebrate/lux_vale_celebrate_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_lux_vale_celebrate/preview.webp", "sheet": "assets/character-select-sequences/celebrate_lux_vale_celebrate/sheet.webp", "cover": "assets/character-select-sequences/celebrate_lux_vale_celebrate/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_000.webp", "size": [140, 160], "bytes": 6676}, {"index": 5, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_005.webp", "size": [140, 160], "bytes": 6612}, {"index": 10, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_010.webp", "size": [140, 160], "bytes": 6600}, {"index": 14, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_014.webp", "size": [140, 160], "bytes": 6000}, {"index": 19, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_019.webp", "size": [140, 160], "bytes": 6336}, {"index": 24, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_024.webp", "size": [140, 160], "bytes": 6176}, {"index": 29, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_029.webp", "size": [140, 160], "bytes": 6124}, {"index": 34, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_034.webp", "size": [140, 160], "bytes": 6130}, {"index": 39, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_039.webp", "size": [140, 160], "bytes": 6530}, {"index": 43, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_043.webp", "size": [140, 160], "bytes": 6472}, {"index": 48, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_048.webp", "size": [140, 160], "bytes": 6514}, {"index": 53, "path": "assets/character-select-sequences/celebrate_lux_vale_celebrate/frames/frame_053.webp", "size": [140, 160], "bytes": 6512}], "preview_bytes": 566438, "sheet_bytes": 260480}, {"sequence_id": "celebrate_lux_vale_local_fresh", "character_id": "lux_vale", "character_label": "Lux Vale", "action": "celebrate", "action_label": "选中庆祝", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/celebrate/celebrate_lux_vale_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/lux_vale/celebrate/lux_vale_celebrate_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6676}, {"index": 5, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6612}, {"index": 10, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6600}, {"index": 14, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 6000}, {"index": 19, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6336}, {"index": 24, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 6176}, {"index": 29, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6124}, {"index": 34, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6130}, {"index": 39, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 6530}, {"index": 43, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6472}, {"index": 48, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 6514}, {"index": 53, "path": "assets/character-select-sequences/celebrate_lux_vale_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 6512}], "preview_bytes": 566438, "sheet_bytes": 260480}, {"sequence_id": "idle_lux_vale_idle", "character_id": "lux_vale", "character_label": "Lux Vale", "action": "idle", "action_label": "待机", "version": "idle", "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/idle/idle_lux_vale_idle.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/lux_vale/idle/lux_vale_idle_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_lux_vale_idle/preview.webp", "sheet": "assets/character-select-sequences/idle_lux_vale_idle/sheet.webp", "cover": "assets/character-select-sequences/idle_lux_vale_idle/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_000.webp", "size": [140, 160], "bytes": 6950}, {"index": 5, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_005.webp", "size": [140, 160], "bytes": 7244}, {"index": 10, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_010.webp", "size": [140, 160], "bytes": 6904}, {"index": 14, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_014.webp", "size": [140, 160], "bytes": 7172}, {"index": 19, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_019.webp", "size": [140, 160], "bytes": 7026}, {"index": 24, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_024.webp", "size": [140, 160], "bytes": 6970}, {"index": 29, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_029.webp", "size": [140, 160], "bytes": 7272}, {"index": 34, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_034.webp", "size": [140, 160], "bytes": 6936}, {"index": 39, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_039.webp", "size": [140, 160], "bytes": 7222}, {"index": 43, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_043.webp", "size": [140, 160], "bytes": 6924}, {"index": 48, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_048.webp", "size": [140, 160], "bytes": 7082}, {"index": 53, "path": "assets/character-select-sequences/idle_lux_vale_idle/frames/frame_053.webp", "size": [140, 160], "bytes": 7028}], "preview_bytes": 627844, "sheet_bytes": 292958}, {"sequence_id": "idle_lux_vale_local_fresh", "character_id": "lux_vale", "character_label": "Lux Vale", "action": "idle", "action_label": "待机", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/lux_vale/idle/idle_lux_vale_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/lux_vale/idle/lux_vale_idle_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_lux_vale_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/idle_lux_vale_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/idle_lux_vale_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6950}, {"index": 5, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 7244}, {"index": 10, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6904}, {"index": 14, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 7172}, {"index": 19, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 7026}, {"index": 24, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 6970}, {"index": 29, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 7272}, {"index": 34, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6936}, {"index": 39, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 7222}, {"index": 43, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6924}, {"index": 48, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 7082}, {"index": 53, "path": "assets/character-select-sequences/idle_lux_vale_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 7028}], "preview_bytes": 627844, "sheet_bytes": 292958}, {"sequence_id": "celebrate_maya_comet_celebrate", "character_id": "maya_comet", "character_label": "Maya Comet", "action": "celebrate", "action_label": "选中庆祝", "version": "celebrate", "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/celebrate/celebrate_maya_comet_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/maya_comet/celebrate/maya_comet_celebrate_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_maya_comet_celebrate/preview.webp", "sheet": "assets/character-select-sequences/celebrate_maya_comet_celebrate/sheet.webp", "cover": "assets/character-select-sequences/celebrate_maya_comet_celebrate/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_000.webp", "size": [140, 160], "bytes": 6074}, {"index": 5, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_005.webp", "size": [140, 160], "bytes": 6320}, {"index": 10, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_010.webp", "size": [140, 160], "bytes": 6306}, {"index": 14, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_014.webp", "size": [140, 160], "bytes": 6418}, {"index": 19, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_019.webp", "size": [140, 160], "bytes": 6052}, {"index": 24, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_024.webp", "size": [140, 160], "bytes": 6122}, {"index": 29, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_029.webp", "size": [140, 160], "bytes": 6154}, {"index": 34, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_034.webp", "size": [140, 160], "bytes": 6466}, {"index": 39, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_039.webp", "size": [140, 160], "bytes": 6320}, {"index": 43, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_043.webp", "size": [140, 160], "bytes": 6358}, {"index": 48, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_048.webp", "size": [140, 160], "bytes": 6470}, {"index": 53, "path": "assets/character-select-sequences/celebrate_maya_comet_celebrate/frames/frame_053.webp", "size": [140, 160], "bytes": 6412}], "preview_bytes": 565886, "sheet_bytes": 267740}, {"sequence_id": "celebrate_maya_comet_local_fresh", "character_id": "maya_comet", "character_label": "Maya Comet", "action": "celebrate", "action_label": "选中庆祝", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/celebrate/celebrate_maya_comet_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/maya_comet/celebrate/maya_comet_celebrate_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6074}, {"index": 5, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6320}, {"index": 10, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6306}, {"index": 14, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 6418}, {"index": 19, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6052}, {"index": 24, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 6122}, {"index": 29, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6154}, {"index": 34, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6466}, {"index": 39, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 6320}, {"index": 43, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6358}, {"index": 48, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 6470}, {"index": 53, "path": "assets/character-select-sequences/celebrate_maya_comet_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 6412}], "preview_bytes": 565886, "sheet_bytes": 267740}, {"sequence_id": "idle_maya_comet_idle", "character_id": "maya_comet", "character_label": "Maya Comet", "action": "idle", "action_label": "待机", "version": "idle", "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/idle/idle_maya_comet_idle.json", "source_video_path": "assets/generated/raw/character_select_sequences/maya_comet/idle/maya_comet_idle_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_maya_comet_idle/preview.webp", "sheet": "assets/character-select-sequences/idle_maya_comet_idle/sheet.webp", "cover": "assets/character-select-sequences/idle_maya_comet_idle/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_000.webp", "size": [140, 160], "bytes": 6272}, {"index": 5, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_005.webp", "size": [140, 160], "bytes": 6286}, {"index": 10, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_010.webp", "size": [140, 160], "bytes": 6268}, {"index": 14, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_014.webp", "size": [140, 160], "bytes": 6224}, {"index": 19, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_019.webp", "size": [140, 160], "bytes": 6232}, {"index": 24, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_024.webp", "size": [140, 160], "bytes": 6250}, {"index": 29, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_029.webp", "size": [140, 160], "bytes": 6256}, {"index": 34, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_034.webp", "size": [140, 160], "bytes": 6174}, {"index": 39, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_039.webp", "size": [140, 160], "bytes": 6208}, {"index": 43, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_043.webp", "size": [140, 160], "bytes": 6220}, {"index": 48, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_048.webp", "size": [140, 160], "bytes": 6212}, {"index": 53, "path": "assets/character-select-sequences/idle_maya_comet_idle/frames/frame_053.webp", "size": [140, 160], "bytes": 6260}], "preview_bytes": 563126, "sheet_bytes": 271654}, {"sequence_id": "idle_maya_comet_local_fresh", "character_id": "maya_comet", "character_label": "Maya Comet", "action": "idle", "action_label": "待机", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/maya_comet/idle/idle_maya_comet_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/maya_comet/idle/maya_comet_idle_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_maya_comet_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/idle_maya_comet_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/idle_maya_comet_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6272}, {"index": 5, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6286}, {"index": 10, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6268}, {"index": 14, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 6224}, {"index": 19, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6232}, {"index": 24, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 6250}, {"index": 29, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6256}, {"index": 34, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6174}, {"index": 39, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 6208}, {"index": 43, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6220}, {"index": 48, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 6212}, {"index": 53, "path": "assets/character-select-sequences/idle_maya_comet_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 6260}], "preview_bytes": 563126, "sheet_bytes": 271654}, {"sequence_id": "celebrate_nova_palm_celebrate", "character_id": "nova_palm", "character_label": "Nova Palm", "action": "celebrate", "action_label": "选中庆祝", "version": "celebrate", "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/celebrate/celebrate_nova_palm_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/nova_palm/celebrate/nova_palm_celebrate_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_nova_palm_celebrate/preview.webp", "sheet": "assets/character-select-sequences/celebrate_nova_palm_celebrate/sheet.webp", "cover": "assets/character-select-sequences/celebrate_nova_palm_celebrate/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_000.webp", "size": [140, 160], "bytes": 6496}, {"index": 5, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_005.webp", "size": [140, 160], "bytes": 6540}, {"index": 10, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_010.webp", "size": [140, 160], "bytes": 6544}, {"index": 14, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_014.webp", "size": [140, 160], "bytes": 6628}, {"index": 19, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_019.webp", "size": [140, 160], "bytes": 6578}, {"index": 24, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_024.webp", "size": [140, 160], "bytes": 5894}, {"index": 29, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_029.webp", "size": [140, 160], "bytes": 6154}, {"index": 34, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_034.webp", "size": [140, 160], "bytes": 5888}, {"index": 39, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_039.webp", "size": [140, 160], "bytes": 6666}, {"index": 43, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_043.webp", "size": [140, 160], "bytes": 6502}, {"index": 48, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_048.webp", "size": [140, 160], "bytes": 6538}, {"index": 53, "path": "assets/character-select-sequences/celebrate_nova_palm_celebrate/frames/frame_053.webp", "size": [140, 160], "bytes": 6502}], "preview_bytes": 571762, "sheet_bytes": 261410}, {"sequence_id": "celebrate_nova_palm_local_fresh", "character_id": "nova_palm", "character_label": "Nova Palm", "action": "celebrate", "action_label": "选中庆祝", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/celebrate/celebrate_nova_palm_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/nova_palm/celebrate/nova_palm_celebrate_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6496}, {"index": 5, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6540}, {"index": 10, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6544}, {"index": 14, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 6628}, {"index": 19, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6578}, {"index": 24, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 5894}, {"index": 29, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6154}, {"index": 34, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 5888}, {"index": 39, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 6666}, {"index": 43, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6502}, {"index": 48, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 6538}, {"index": 53, "path": "assets/character-select-sequences/celebrate_nova_palm_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 6502}], "preview_bytes": 571762, "sheet_bytes": 261410}, {"sequence_id": "idle_nova_palm_idle", "character_id": "nova_palm", "character_label": "Nova Palm", "action": "idle", "action_label": "待机", "version": "idle", "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/idle/idle_nova_palm_idle.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/nova_palm/idle/nova_palm_idle_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_nova_palm_idle/preview.webp", "sheet": "assets/character-select-sequences/idle_nova_palm_idle/sheet.webp", "cover": "assets/character-select-sequences/idle_nova_palm_idle/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_000.webp", "size": [140, 160], "bytes": 6586}, {"index": 5, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_005.webp", "size": [140, 160], "bytes": 6564}, {"index": 10, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_010.webp", "size": [140, 160], "bytes": 6572}, {"index": 14, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_014.webp", "size": [140, 160], "bytes": 6530}, {"index": 19, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_019.webp", "size": [140, 160], "bytes": 6616}, {"index": 24, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_024.webp", "size": [140, 160], "bytes": 6688}, {"index": 29, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_029.webp", "size": [140, 160], "bytes": 6518}, {"index": 34, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_034.webp", "size": [140, 160], "bytes": 6458}, {"index": 39, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_039.webp", "size": [140, 160], "bytes": 6548}, {"index": 43, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_043.webp", "size": [140, 160], "bytes": 6522}, {"index": 48, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_048.webp", "size": [140, 160], "bytes": 6536}, {"index": 53, "path": "assets/character-select-sequences/idle_nova_palm_idle/frames/frame_053.webp", "size": [140, 160], "bytes": 6484}], "preview_bytes": 587320, "sheet_bytes": 268812}, {"sequence_id": "idle_nova_palm_local_fresh", "character_id": "nova_palm", "character_label": "Nova Palm", "action": "idle", "action_label": "待机", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/nova_palm/idle/idle_nova_palm_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/nova_palm/idle/nova_palm_idle_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_nova_palm_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/idle_nova_palm_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/idle_nova_palm_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6586}, {"index": 5, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6564}, {"index": 10, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6572}, {"index": 14, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 6530}, {"index": 19, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6616}, {"index": 24, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 6688}, {"index": 29, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6518}, {"index": 34, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6458}, {"index": 39, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 6548}, {"index": 43, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6522}, {"index": 48, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 6536}, {"index": 53, "path": "assets/character-select-sequences/idle_nova_palm_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 6484}], "preview_bytes": 587320, "sheet_bytes": 268812}, {"sequence_id": "celebrate_rosa_rivet_celebrate", "character_id": "rosa_rivet", "character_label": "Rosa Rivet", "action": "celebrate", "action_label": "选中庆祝", "version": "celebrate", "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/celebrate/celebrate_rosa_rivet_celebrate.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/rosa_rivet/celebrate/rosa_rivet_celebrate_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/preview.webp", "sheet": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/sheet.webp", "cover": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_000.webp", "size": [140, 160], "bytes": 6396}, {"index": 5, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_005.webp", "size": [140, 160], "bytes": 6506}, {"index": 10, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_010.webp", "size": [140, 160], "bytes": 6178}, {"index": 14, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_014.webp", "size": [140, 160], "bytes": 6148}, {"index": 19, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_019.webp", "size": [140, 160], "bytes": 6346}, {"index": 24, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_024.webp", "size": [140, 160], "bytes": 6396}, {"index": 29, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_029.webp", "size": [140, 160], "bytes": 6136}, {"index": 34, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_034.webp", "size": [140, 160], "bytes": 6360}, {"index": 39, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_039.webp", "size": [140, 160], "bytes": 6420}, {"index": 43, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_043.webp", "size": [140, 160], "bytes": 6396}, {"index": 48, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_048.webp", "size": [140, 160], "bytes": 6486}, {"index": 53, "path": "assets/character-select-sequences/celebrate_rosa_rivet_celebrate/frames/frame_053.webp", "size": [140, 160], "bytes": 6426}], "preview_bytes": 572142, "sheet_bytes": 258090}, {"sequence_id": "celebrate_rosa_rivet_local_fresh", "character_id": "rosa_rivet", "character_label": "Rosa Rivet", "action": "celebrate", "action_label": "选中庆祝", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/celebrate/celebrate_rosa_rivet_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/rosa_rivet/celebrate/rosa_rivet_celebrate_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6396}, {"index": 5, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6506}, {"index": 10, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6178}, {"index": 14, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 6148}, {"index": 19, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6346}, {"index": 24, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 6396}, {"index": 29, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6136}, {"index": 34, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6360}, {"index": 39, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 6420}, {"index": 43, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6396}, {"index": 48, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 6486}, {"index": 53, "path": "assets/character-select-sequences/celebrate_rosa_rivet_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 6426}], "preview_bytes": 572142, "sheet_bytes": 258090}, {"sequence_id": "idle_rosa_rivet_idle", "character_id": "rosa_rivet", "character_label": "Rosa Rivet", "action": "idle", "action_label": "待机", "version": "idle", "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/idle/idle_rosa_rivet_idle.json", "source_video_path": "D:/Work/godot-action-brawler/assets/generated/raw/character_select_sequences/rosa_rivet/idle/rosa_rivet_idle_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 6, "loop_end": 60, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_rosa_rivet_idle/preview.webp", "sheet": "assets/character-select-sequences/idle_rosa_rivet_idle/sheet.webp", "cover": "assets/character-select-sequences/idle_rosa_rivet_idle/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_000.webp", "size": [140, 160], "bytes": 6600}, {"index": 5, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_005.webp", "size": [140, 160], "bytes": 6632}, {"index": 10, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_010.webp", "size": [140, 160], "bytes": 6638}, {"index": 14, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_014.webp", "size": [140, 160], "bytes": 6550}, {"index": 19, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_019.webp", "size": [140, 160], "bytes": 6548}, {"index": 24, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_024.webp", "size": [140, 160], "bytes": 6388}, {"index": 29, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_029.webp", "size": [140, 160], "bytes": 6362}, {"index": 34, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_034.webp", "size": [140, 160], "bytes": 6442}, {"index": 39, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_039.webp", "size": [140, 160], "bytes": 6478}, {"index": 43, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_043.webp", "size": [140, 160], "bytes": 6462}, {"index": 48, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_048.webp", "size": [140, 160], "bytes": 6468}, {"index": 53, "path": "assets/character-select-sequences/idle_rosa_rivet_idle/frames/frame_053.webp", "size": [140, 160], "bytes": 6446}], "preview_bytes": 590128, "sheet_bytes": 267790}, {"sequence_id": "idle_rosa_rivet_local_fresh", "character_id": "rosa_rivet", "character_label": "Rosa Rivet", "action": "idle", "action_label": "待机", "version": "local_procedural_fresh", "metadata_path": "assets/generated/processed/character_select_sequences/rosa_rivet/idle/idle_rosa_rivet_local_fresh.json", "source_video_path": "assets/generated/raw/character_select_sequences/rosa_rivet/idle/rosa_rivet_idle_local_fresh.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/preview.webp", "sheet": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/sheet.webp", "cover": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_000.webp", "size": [140, 160], "bytes": 6600}, {"index": 5, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_005.webp", "size": [140, 160], "bytes": 6632}, {"index": 10, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_010.webp", "size": [140, 160], "bytes": 6638}, {"index": 14, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_014.webp", "size": [140, 160], "bytes": 6550}, {"index": 19, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_019.webp", "size": [140, 160], "bytes": 6548}, {"index": 24, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_024.webp", "size": [140, 160], "bytes": 6388}, {"index": 29, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_029.webp", "size": [140, 160], "bytes": 6362}, {"index": 34, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_034.webp", "size": [140, 160], "bytes": 6442}, {"index": 39, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_039.webp", "size": [140, 160], "bytes": 6478}, {"index": 43, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_043.webp", "size": [140, 160], "bytes": 6462}, {"index": 48, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_048.webp", "size": [140, 160], "bytes": 6468}, {"index": 53, "path": "assets/character-select-sequences/idle_rosa_rivet_local_fresh/frames/frame_053.webp", "size": [140, 160], "bytes": 6446}], "preview_bytes": 590128, "sheet_bytes": 267790}, {"sequence_id": "idle_seedance_artdoc_probe_artdoc_v1", "character_id": "seedance_artdoc_probe", "character_label": "Seedance_Art_Doc_Probe", "action": "idle", "action_label": "待机", "version": "ark_seedance_2_0_fast", "metadata_path": "assets/generated/processed/character_select_sequences/seedance_artdoc_probe/idle/idle_seedance_artdoc_probe_artdoc_v1.json", "source_video_path": "assets/generated/raw/character_select_sequences/seedance_artdoc_probe/idle/seedance_artdoc_probe_idle_artdoc_v1.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/preview.webp", "sheet": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/sheet.webp", "cover": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_000.webp", "size": [140, 160], "bytes": 5030}, {"index": 5, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_005.webp", "size": [140, 160], "bytes": 5050}, {"index": 10, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_010.webp", "size": [140, 160], "bytes": 5002}, {"index": 14, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_014.webp", "size": [140, 160], "bytes": 5122}, {"index": 19, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_019.webp", "size": [140, 160], "bytes": 5064}, {"index": 24, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_024.webp", "size": [140, 160], "bytes": 4990}, {"index": 29, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_029.webp", "size": [140, 160], "bytes": 4978}, {"index": 34, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_034.webp", "size": [140, 160], "bytes": 4906}, {"index": 39, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_039.webp", "size": [140, 160], "bytes": 5102}, {"index": 43, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_043.webp", "size": [140, 160], "bytes": 5014}, {"index": 48, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_048.webp", "size": [140, 160], "bytes": 4890}, {"index": 53, "path": "assets/character-select-sequences/idle_seedance_artdoc_probe_artdoc_v1/frames/frame_053.webp", "size": [140, 160], "bytes": 4992}], "preview_bytes": 257370, "sheet_bytes": 203078}, {"sequence_id": "idle_seedance_probe_seedance", "character_id": "seedance_probe", "character_label": "Seedance Probe", "action": "idle", "action_label": "待机", "version": "ark_seedance_2_0_fast", "metadata_path": "assets/generated/processed/character_select_sequences/seedance_probe/idle/idle_seedance_probe_seedance.json", "source_video_path": "assets/generated/raw/character_select_sequences/seedance_probe/idle/seedance_probe_idle_seedance.mp4", "frame_count": 54, "frame_width": 224, "frame_height": 256, "sample_fps": 12, "playback_fps": 12.0, "loop_start": 0, "loop_end": 54, "loop_source_frame_count": 54, "preview": "assets/character-select-sequences/idle_seedance_probe_seedance/preview.webp", "sheet": "assets/character-select-sequences/idle_seedance_probe_seedance/sheet.webp", "cover": "assets/character-select-sequences/idle_seedance_probe_seedance/cover.webp", "frame_strip": [{"index": 0, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_000.webp", "size": [140, 160], "bytes": 4832}, {"index": 5, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_005.webp", "size": [140, 160], "bytes": 4758}, {"index": 10, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_010.webp", "size": [140, 160], "bytes": 4764}, {"index": 14, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_014.webp", "size": [140, 160], "bytes": 4880}, {"index": 19, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_019.webp", "size": [140, 160], "bytes": 4756}, {"index": 24, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_024.webp", "size": [140, 160], "bytes": 4764}, {"index": 29, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_029.webp", "size": [140, 160], "bytes": 4906}, {"index": 34, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_034.webp", "size": [140, 160], "bytes": 4670}, {"index": 39, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_039.webp", "size": [140, 160], "bytes": 4758}, {"index": 43, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_043.webp", "size": [140, 160], "bytes": 4900}, {"index": 48, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_048.webp", "size": [140, 160], "bytes": 4720}, {"index": 53, "path": "assets/character-select-sequences/idle_seedance_probe_seedance/frames/frame_053.webp", "size": [140, 160], "bytes": 4842}], "preview_bytes": 238200, "sheet_bytes": 200538}];
+    const serverJobs = [];
+    const serverEdits = [];
+    const siteUrl = "https://lihao95808.github.io/action-game-2d-art-library/";
+    const storageKey = "action_game_2d_character_workspace_v1";
+    const cloudSettingsKey = "action_game_2d_character_cloud_v1";
+    const stages = [
+      ["profile", "人物层"],
+      ["concept", "人设图"],
+      ["standing", "站立图"],
+      ["actions", "动作表"],
+      ["focus", "当前动作"],
+      ["sequences", "序列帧"]
+    ];
+    let localState = loadLocal();
+    let characters = mergeCharacters(sourceCharacters, serverEdits, localState.characters || []);
+    let jobs = mergeJobs(serverJobs, localState.jobs || []);
+    let selectedCharacterId = localState.selectedCharacterId || (characters[0] && characters[0].character_id) || "";
+    let selectedActionId = localState.selectedActionId || "";
+    let activeStage = localState.activeStage || "profile";
+    let syncTimer = null;
+
+    function defaultSlot() { return {status: "needed", prompt: "", assets: []}; }
+    function defaultCharacter(id, name) {
+      return {
+        character_id: id,
+        display_name: name || id,
+        short_label: "",
+        status: "draft",
+        role: "",
+        background: "",
+        personality: "",
+        preferences: "",
+        action_style: "",
+        persona_text: "",
+        concept_art: defaultSlot(),
+        standing_idle: defaultSlot(),
+        actions: [],
+        notes: ""
+      };
+    }
+    function defaultAction(id, name) {
+      return {
+        action_id: id,
+        display_name: name || id,
+        status: "draft",
+        design_text: "",
+        seedance_prompt: "",
+        current_sequence_id: "",
+        notes: "",
+        sequences: []
+      };
+    }
+    function normalizeCharacter(raw) {
+      const c = Object.assign(defaultCharacter(raw.character_id || raw.id || "character", raw.display_name || raw.label), raw);
+      c.concept_art = Object.assign(defaultSlot(), raw.concept_art || {});
+      c.concept_art.assets = Array.isArray(c.concept_art.assets) ? c.concept_art.assets : [];
+      c.standing_idle = Object.assign(defaultSlot(), raw.standing_idle || {});
+      c.standing_idle.assets = Array.isArray(c.standing_idle.assets) ? c.standing_idle.assets : [];
+      c.actions = (raw.actions || []).map(a => Object.assign(defaultAction(a.action_id || a.id, a.display_name || a.label), a));
+      return c;
+    }
+    function mergeCharacters(...lists) {
+      const map = new Map();
+      for (const list of lists) {
+        for (const raw of (Array.isArray(list) ? list : [])) {
+          if (!raw || !raw.character_id) continue;
+          const existing = map.get(raw.character_id) || {};
+          const merged = normalizeCharacter(Object.assign({}, existing, raw));
+          const actionMap = new Map();
+          for (const action of ((existing.actions || []).concat(raw.actions || []))) {
+            if (!action || !action.action_id) continue;
+            actionMap.set(action.action_id, Object.assign(defaultAction(action.action_id), actionMap.get(action.action_id) || {}, action));
+          }
+          merged.actions = Array.from(actionMap.values());
+          map.set(merged.character_id, merged);
+        }
+      }
+      return Array.from(map.values()).sort((a, b) => (a.status === "archived") - (b.status === "archived") || a.character_id.localeCompare(b.character_id));
+    }
+    function mergeJobs(...lists) {
+      const map = new Map();
+      for (const list of lists) {
+        for (const job of (Array.isArray(list) ? list : [])) {
+          if (job && job.job_id) map.set(job.job_id, Object.assign({}, map.get(job.job_id) || {}, job));
+        }
+      }
+      return Array.from(map.values()).sort((a, b) => String(b.created_at || "").localeCompare(String(a.created_at || "")));
+    }
+    function loadLocal() {
+      try { return JSON.parse(localStorage.getItem(storageKey) || "{}"); } catch { return {}; }
+    }
+    function saveLocal() {
+      localStorage.setItem(storageKey, JSON.stringify({characters, jobs, selectedCharacterId, selectedActionId, activeStage}));
+      scheduleCloudSync();
+    }
+    function selectedCharacter() {
+      return characters.find(c => c.character_id === selectedCharacterId) || characters[0] || null;
+    }
+    function selectedAction(character) {
+      if (!character) return null;
+      return character.actions.find(a => a.action_id === selectedActionId) || character.actions[0] || null;
+    }
+    function render() {
+      renderCharacters();
+      renderStages();
+      renderStage();
+      renderFocus();
+    }
+    function renderCharacters() {
+      const query = document.getElementById("characterSearch").value.trim().toLowerCase();
+      const status = document.getElementById("statusFilter").value;
+      const list = characters.filter(c => {
+        if (status !== "all" && c.status !== status) return false;
+        const haystack = [c.character_id, c.display_name, c.role, c.action_style, c.notes].join(" ").toLowerCase();
+        return !query || haystack.includes(query);
+      });
+      document.getElementById("characterList").innerHTML = list.map(c => `
+        <button class="character-card ${c.character_id === selectedCharacterId ? "active" : ""} ${c.status === "archived" ? "archived" : ""}" data-select-character="${escapeAttr(c.character_id)}">
+          <strong>${escapeHtml(c.display_name)}</strong>
+          <span class="small">${escapeHtml(c.character_id)} · ${escapeHtml(c.role || "未定角色定位")}</span>
+          <span class="pill-row"><span class="pill">${escapeHtml(c.status)}</span><span class="pill">${c.actions.length} 动作</span><span class="pill">${sequenceCount(c)} 序列</span></span>
+        </button>
+      `).join("") || '<div class="empty">还没有人物。点击“新增人物”建立源头。</div>';
+      document.querySelectorAll("[data-select-character]").forEach(button => button.addEventListener("click", () => {
+        selectedCharacterId = button.dataset.selectCharacter;
+        const c = selectedCharacter();
+        selectedActionId = (c.actions[0] && c.actions[0].action_id) || "";
+        saveLocal();
+        render();
+      }));
+    }
+    function sequenceCount(character) {
+      return character.actions.reduce((sum, action) => sum + (action.sequences || []).length, 0);
+    }
+    function renderStages() {
+      document.getElementById("stageTabs").innerHTML = stages.map(([id, label]) => `<button class="${id === activeStage ? "active" : ""}" data-stage="${id}">${label}</button>`).join("");
+      document.querySelectorAll("[data-stage]").forEach(button => button.addEventListener("click", () => {
+        activeStage = button.dataset.stage;
+        saveLocal();
+        renderStage();
+      }));
+    }
+    function renderStage() {
+      const c = selectedCharacter();
+      if (!c) {
+        document.getElementById("stagePanel").innerHTML = '<div class="panel empty">请选择或新增人物。</div>';
+        return;
+      }
+      if (activeStage === "profile") renderProfile(c);
+      if (activeStage === "concept") renderArtSlot(c, "concept_art", "人设图层", "由文字人设生成绘图提示词，再排队调用 GPT Image。", "image_character_concept");
+      if (activeStage === "standing") renderArtSlot(c, "standing_idle", "游戏比例站立图层", "基于人设图生成正式游戏比例站立/待机垫图。", "image_standing_idle");
+      if (activeStage === "actions") renderActions(c);
+      if (activeStage === "focus") renderActionFocus(c);
+      if (activeStage === "sequences") renderSequences(c);
+    }
+    function renderProfile(c) {
+      document.getElementById("stagePanel").innerHTML = `
+        <div class="panel">
+          <h2>${escapeHtml(c.display_name)} · 人物层</h2>
+          <div class="grid-3">
+            ${field("display_name", "人物名", c.display_name)}
+            ${field("short_label", "短标签", c.short_label)}
+            ${field("role", "定位", c.role)}
+          </div>
+          <div class="grid-2">
+            ${selectField("status", "状态", c.status, ["active", "draft", "archived"])}
+            ${field("action_style", "动作流派", c.action_style)}
+          </div>
+          ${area("background", "背景设定", c.background)}
+          ${area("personality", "性格", c.personality)}
+          ${area("preferences", "个人喜好 / 禁忌", c.preferences)}
+          ${area("persona_text", "文字人设", c.persona_text)}
+          ${area("notes", "备注", c.notes)}
+          <div class="toolbar">
+            <button class="good" id="queueBackground">排队 AI 背景/设定草稿</button>
+            <button class="warn" id="toggleArchive">${c.status === "archived" ? "恢复人物" : "归档人物"}</button>
+          </div>
+        </div>
+      `;
+      bindCharacterFields(c);
+      document.getElementById("queueBackground").addEventListener("click", () => enqueueJob("draft_character_background", c, null, {stage: "profile"}));
+      document.getElementById("toggleArchive").addEventListener("click", () => {
+        c.status = c.status === "archived" ? "active" : "archived";
+        saveLocal();
+        render();
+      });
+    }
+    function renderArtSlot(c, slotName, title, intro, jobType) {
+      const slot = c[slotName] || defaultSlot();
+      document.getElementById("stagePanel").innerHTML = `
+        <div class="panel">
+          <h2>${escapeHtml(title)}</h2>
+          <p class="muted">${escapeHtml(intro)}</p>
+          <div class="grid-2">
+            ${selectSlotField(slotName, "status", "状态", slot.status, ["needed", "prompted", "generated", "approved", "archived"])}
+            ${fieldReadonly("reference", "人物", c.display_name + " / " + c.character_id)}
+          </div>
+          ${areaSlot(slotName, "prompt", "绘图提示词", slot.prompt)}
+          <div class="toolbar">
+            <button class="good" id="queueArtJob">排队生成</button>
+            <button id="addAssetPath">登记参考图路径</button>
+          </div>
+          <h3>参考 / 结果图</h3>
+          <div class="slot-assets">
+            ${(slot.assets || []).map((asset, index) => assetCard(asset, slotName, index)).join("") || '<div class="empty">还没有登记图片。可以先写文字人设，再排队生成。</div>'}
+          </div>
+        </div>
+      `;
+      bindSlotFields(c, slotName);
+      document.getElementById("queueArtJob").addEventListener("click", () => enqueueJob(jobType, c, null, {slot: slotName, prompt: slot.prompt}));
+      document.getElementById("addAssetPath").addEventListener("click", () => {
+        const path = prompt("图片路径（主仓库相对路径）");
+        if (!path) return;
+        const role = prompt("这张图的职责", slotName === "concept_art" ? "character identity reference" : "game standing idle reference") || "";
+        slot.assets = slot.assets || [];
+        slot.assets.push({path, role});
+        c[slotName] = slot;
+        saveLocal();
+        renderStage();
+      });
+    }
+    function renderActions(c) {
+      document.getElementById("stagePanel").innerHTML = `
+        <div class="panel">
+          <h2>动作表</h2>
+          <p class="muted">每个人物独立维护动作表；点击某个动作后，它会成为当前焦点，后续 Seedance 请求和序列帧审片都围绕它展开。</p>
+          <div class="toolbar"><button class="primary" id="addAction">新增动作</button></div>
+          <div class="action-list">
+            ${c.actions.map(action => actionCard(c, action)).join("") || '<div class="empty">还没有动作。建议先建立 idle 和 celebrate，再扩展攻击、受击、移动等动作。</div>'}
+          </div>
+        </div>
+      `;
+      document.getElementById("addAction").addEventListener("click", () => {
+        const id = slugify(prompt("动作 ID，例如 light_attack") || "");
+        if (!id) return;
+        const name = prompt("动作显示名", id) || id;
+        c.actions.push(defaultAction(id, name));
+        selectedActionId = id;
+        activeStage = "focus";
+        saveLocal();
+        render();
+      });
+      document.querySelectorAll("[data-select-action]").forEach(button => button.addEventListener("click", () => {
+        selectedActionId = button.dataset.selectAction;
+        activeStage = "focus";
+        saveLocal();
+        render();
+      }));
+      document.querySelectorAll("[data-archive-action]").forEach(button => button.addEventListener("click", () => {
+        const action = c.actions.find(item => item.action_id === button.dataset.archiveAction);
+        if (!action) return;
+        action.status = action.status === "archived" ? "active" : "archived";
+        saveLocal();
+        renderStage();
+      }));
+    }
+    function renderActionFocus(c) {
+      const action = selectedAction(c);
+      if (!action) {
+        document.getElementById("stagePanel").innerHTML = '<div class="panel empty">请先在动作表里新增或选择一个动作。</div>';
+        return;
+      }
+      selectedActionId = action.action_id;
+      document.getElementById("stagePanel").innerHTML = `
+        <div class="panel">
+          <h2>当前动作：${escapeHtml(action.display_name)}</h2>
+          <div class="grid-3">
+            ${fieldAction("display_name", "动作名", action.display_name)}
+            ${selectActionField("status", "状态", action.status, ["active", "draft", "archived"])}
+            ${fieldAction("current_sequence_id", "当前采用序列", action.current_sequence_id)}
+          </div>
+          ${areaAction("design_text", "动作设计文字版", action.design_text)}
+          ${areaAction("seedance_prompt", "Seedance 2.0 提示词草稿", action.seedance_prompt)}
+          <div class="toolbar">
+            <button id="draftActionDesign">排队 AI 招式文字设计</button>
+            <button id="buildSeedancePrompt">生成本地提示词草稿</button>
+            <button class="good" id="queueSeedance">排队 Seedance 单动作视频</button>
+            <button id="queueExtract">排队抽帧/重抽帧</button>
+          </div>
+        </div>
+      `;
+      bindActionFields(c, action);
+      document.getElementById("draftActionDesign").addEventListener("click", () => enqueueJob("draft_action_design", c, action, {stage: "action_design"}));
+      document.getElementById("buildSeedancePrompt").addEventListener("click", () => {
+        action.seedance_prompt = buildSeedancePrompt(c, action);
+        saveLocal();
+        renderStage();
+      });
+      document.getElementById("queueSeedance").addEventListener("click", () => enqueueJob("video_action_seedance", c, action, {prompt: action.seedance_prompt || buildSeedancePrompt(c, action)}));
+      document.getElementById("queueExtract").addEventListener("click", () => enqueueJob("extract_sequence", c, action, {current_sequence_id: action.current_sequence_id}));
+    }
+    function renderSequences(c) {
+      const action = selectedAction(c);
+      const sequences = (action && action.sequences && action.sequences.length) ? action.sequences : c.actions.flatMap(item => item.sequences || []);
+      document.getElementById("stagePanel").innerHTML = `
+        <div class="panel">
+          <h2>序列帧层</h2>
+          <p class="muted">这里按当前人物和当前动作聚合已有序列。精细 loop、问题勾选和重生成请求仍进入序列帧审片页。</p>
+          <div class="toolbar"><a href="sequences.html" target="_blank" rel="noopener">打开序列帧审片页</a></div>
+          <div class="sequence-grid">
+            ${sequences.map(sequenceCard).join("") || '<div class="empty">当前人物/动作还没有发布过的序列帧。</div>'}
+          </div>
+        </div>
+      `;
+    }
+    function renderFocus() {
+      const c = selectedCharacter();
+      const action = selectedAction(c);
+      const relatedJobs = jobs.filter(job => c && job.character_id === c.character_id).slice(0, 8);
+      document.getElementById("focusPanel").innerHTML = `
+        <div class="panel">
+          <h3>当前焦点</h3>
+          ${c ? `<div class="pill-row"><span class="pill good">${escapeHtml(c.display_name)}</span><span class="pill">${escapeHtml(c.status)}</span></div>` : ""}
+          ${action ? `<p><strong>${escapeHtml(action.display_name)}</strong><br><span class="small">${escapeHtml(action.action_id)}</span></p>` : '<p class="muted">未选动作</p>'}
+          <p class="small">人物面板的所有 AI 生成按钮只写入队列；Codex/CLI 后续读取队列执行真实生图、视频生成和抽帧。</p>
+        </div>
+        <div class="panel">
+          <h3>人物请求队列</h3>
+          <div class="job-list">
+            ${relatedJobs.map(jobCard).join("") || '<div class="empty">当前人物暂无请求。</div>'}
+          </div>
+        </div>
+      `;
+    }
+    function enqueueJob(type, character, action, payload) {
+      const createdAt = new Date().toISOString();
+      const job = {
+        job_id: [character.character_id, action ? action.action_id : "character", type, createdAt.replace(/[-:.TZ]/g, "")].join("_"),
+        type,
+        status: "pending",
+        character_id: character.character_id,
+        action_id: action ? action.action_id : "",
+        created_at: createdAt,
+        created_by: document.getElementById("cloudReviewer").value.trim() || "duzuguang",
+        source: "character_workspace",
+        payload: Object.assign({
+          character_snapshot: minimalCharacter(character),
+          action_snapshot: action ? minimalAction(action) : null
+        }, payload || {}),
+        notes: ""
+      };
+      jobs.unshift(job);
+      saveLocal();
+      setSyncStatus("已加入人物请求队列：" + type);
+      renderFocus();
+    }
+    function buildSeedancePrompt(c, action) {
+      const identity = [c.display_name, c.role, c.persona_text, c.action_style].filter(Boolean).join("; ");
+      const actionText = action.design_text || "controlled readable action for a fighting-game character sprite";
+      return [
+        "Sunny Arcade Compact-Q v1, original modern-retro American sunny cartoon 2D beat-em-up game sprite.",
+        "Reference role: the standing idle image is the character identity, outfit, proportions, and first-frame pose reference; keep face, outfit, hair, body size, and feet baseline consistent.",
+        "Subject: " + identity,
+        "Action details: " + actionText,
+        "Scene: solid pure green background #00ff00, no floor, no scenery, no shadow, no reflection, no text, no watermark.",
+        "Action timeline:",
+        "0.0-1.25s: full body centered in orthographic side-view or near-profile side-view, start from a stable readable combat pose.",
+        "1.25-3.75s: perform one clear " + action.display_name + " motion with controlled amplitude, readable hands and feet, no camera movement.",
+        "3.75-5.00s: settle into a stable pose or return near the starting stance for extraction.",
+        "Camera: fixed camera, no zoom, no pan, no rotation, full body always inside frame.",
+        "Style and quality: clean thick ink outlines, soft cel shading, readable silhouette, stable face and hands, natural fluid motion.",
+        "Constraints: no text, no watermark, no unrelated characters, no body deformation, no motion blur, no particles, no background objects."
+      ].join("\n");
+    }
+    function minimalCharacter(c) {
+      return {character_id: c.character_id, display_name: c.display_name, role: c.role, persona_text: c.persona_text, action_style: c.action_style, concept_art: c.concept_art, standing_idle: c.standing_idle};
+    }
+    function minimalAction(action) {
+      return {action_id: action.action_id, display_name: action.display_name, design_text: action.design_text, seedance_prompt: action.seedance_prompt, current_sequence_id: action.current_sequence_id};
+    }
+    function buildPayload() {
+      return {updated_at: new Date().toISOString(), type: "character_workspace", characters, jobs};
+    }
+    function field(name, label, value) {
+      return `<label class="field"><span>${escapeHtml(label)}</span><input data-char-field="${escapeAttr(name)}" value="${escapeAttr(value)}"></label>`;
+    }
+    function fieldReadonly(name, label, value) {
+      return `<label class="field"><span>${escapeHtml(label)}</span><input data-readonly="${escapeAttr(name)}" value="${escapeAttr(value)}" readonly></label>`;
+    }
+    function selectField(name, label, value, options) {
+      return `<label class="field"><span>${escapeHtml(label)}</span><select data-char-field="${escapeAttr(name)}">${options.map(option => `<option value="${escapeAttr(option)}" ${option === value ? "selected" : ""}>${escapeHtml(option)}</option>`).join("")}</select></label>`;
+    }
+    function area(name, label, value) {
+      return `<label class="field"><span>${escapeHtml(label)}</span><textarea data-char-field="${escapeAttr(name)}">${escapeHtml(value)}</textarea></label>`;
+    }
+    function selectSlotField(slot, name, label, value, options) {
+      return `<label class="field"><span>${escapeHtml(label)}</span><select data-slot="${escapeAttr(slot)}" data-slot-field="${escapeAttr(name)}">${options.map(option => `<option value="${escapeAttr(option)}" ${option === value ? "selected" : ""}>${escapeHtml(option)}</option>`).join("")}</select></label>`;
+    }
+    function areaSlot(slot, name, label, value) {
+      return `<label class="field"><span>${escapeHtml(label)}</span><textarea data-slot="${escapeAttr(slot)}" data-slot-field="${escapeAttr(name)}">${escapeHtml(value)}</textarea></label>`;
+    }
+    function fieldAction(name, label, value) {
+      return `<label class="field"><span>${escapeHtml(label)}</span><input data-action-field="${escapeAttr(name)}" value="${escapeAttr(value)}"></label>`;
+    }
+    function selectActionField(name, label, value, options) {
+      return `<label class="field"><span>${escapeHtml(label)}</span><select data-action-field="${escapeAttr(name)}">${options.map(option => `<option value="${escapeAttr(option)}" ${option === value ? "selected" : ""}>${escapeHtml(option)}</option>`).join("")}</select></label>`;
+    }
+    function areaAction(name, label, value) {
+      return `<label class="field"><span>${escapeHtml(label)}</span><textarea data-action-field="${escapeAttr(name)}">${escapeHtml(value)}</textarea></label>`;
+    }
+    function assetCard(asset, slotName, index) {
+      const img = asset.preview ? `<img src="${escapeAttr(asset.preview)}" alt="${escapeAttr(asset.role || slotName)}">` : "";
+      return `<div class="asset-card">${img}<strong>${escapeHtml(asset.role || "reference")}</strong><div class="small">${escapeHtml(asset.path || "")}</div></div>`;
+    }
+    function actionCard(c, action) {
+      return `<div class="action-card ${action.action_id === selectedActionId ? "active" : ""}">
+        <div class="action-row">
+          <strong>${escapeHtml(action.display_name)}</strong>
+          <span class="pill">${escapeHtml(action.action_id)}</span>
+          <span class="pill">${escapeHtml(action.status)}</span>
+          <span class="pill">${(action.sequences || []).length} 序列</span>
+        </div>
+        <div class="small">${escapeHtml(action.design_text || "尚未填写动作设计")}</div>
+        <div class="toolbar">
+          <button data-select-action="${escapeAttr(action.action_id)}">设为当前焦点</button>
+          <button data-archive-action="${escapeAttr(action.action_id)}">${action.status === "archived" ? "恢复" : "归档"}</button>
+        </div>
+      </div>`;
+    }
+    function sequenceCard(seq) {
+      return `<div class="sequence-card">
+        ${seq.preview ? `<img src="${escapeAttr(seq.preview)}" alt="${escapeAttr(seq.sequence_id)}">` : ""}
+        <strong>${escapeHtml(seq.sequence_id)}</strong>
+        <div class="pill-row"><span class="pill">${escapeHtml(seq.version || "")}</span><span class="pill">${escapeHtml(seq.frame_count || 0)} 帧</span><span class="pill">${escapeHtml(seq.playback_fps || 12)} fps</span></div>
+        <div class="small">${escapeHtml(seq.metadata_path || "")}</div>
+      </div>`;
+    }
+    function jobCard(job) {
+      return `<div class="job-card">
+        <strong>${escapeHtml(job.type)}</strong>
+        <div class="pill-row"><span class="pill warn">${escapeHtml(job.status)}</span><span class="pill">${escapeHtml(job.action_id || "人物")}</span></div>
+        <div class="small">${escapeHtml(job.created_at || "")}<br>${escapeHtml(job.job_id || "")}</div>
+      </div>`;
+    }
+    function bindCharacterFields(c) {
+      document.querySelectorAll("[data-char-field]").forEach(input => input.addEventListener("input", () => {
+        c[input.dataset.charField] = input.value;
+        saveLocal();
+        renderCharacters();
+        renderFocus();
+      }));
+    }
+    function bindSlotFields(c, slotName) {
+      c[slotName] = c[slotName] || defaultSlot();
+      document.querySelectorAll("[data-slot-field]").forEach(input => input.addEventListener("input", () => {
+        c[slotName][input.dataset.slotField] = input.value;
+        saveLocal();
+      }));
+    }
+    function bindActionFields(c, action) {
+      document.querySelectorAll("[data-action-field]").forEach(input => input.addEventListener("input", () => {
+        action[input.dataset.actionField] = input.value;
+        saveLocal();
+        renderFocus();
+      }));
+    }
+    function slugify(value) {
+      return String(value).trim().toLowerCase().replace(/[^a-z0-9_-]+/g, "_").replace(/^_+|_+$/g, "");
+    }
+    function escapeHtml(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+    }
+    function escapeAttr(value) { return escapeHtml(value).replace(/`/g, "&#096;"); }
+    function downloadJson(payload, name) {
+      const blob = new Blob([JSON.stringify(payload, null, 2) + "\n"], {type: "application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    function textToBase64(text) {
+      const bytes = new TextEncoder().encode(text);
+      let binary = "";
+      bytes.forEach(b => binary += String.fromCharCode(b));
+      return btoa(binary);
+    }
+    function base64ToText(text) {
+      const binary = atob((text || "").replace(/\n/g, ""));
+      const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+      return new TextDecoder().decode(bytes);
+    }
+    function loadCloudSettings() {
+      const settings = JSON.parse(localStorage.getItem(cloudSettingsKey) || "{}");
+      if (settings.repo) document.getElementById("cloudRepo").value = settings.repo;
+      if (settings.branch) document.getElementById("cloudBranch").value = settings.branch;
+      if (settings.reviewer) document.getElementById("cloudReviewer").value = settings.reviewer;
+      if (settings.token) document.getElementById("cloudToken").value = settings.token;
+    }
+    function saveCloudSettings() {
+      localStorage.setItem(cloudSettingsKey, JSON.stringify({
+        repo: document.getElementById("cloudRepo").value.trim(),
+        branch: document.getElementById("cloudBranch").value.trim() || "main",
+        reviewer: document.getElementById("cloudReviewer").value.trim() || "duzuguang",
+        token: document.getElementById("cloudToken").value.trim()
+      }));
+      setSyncStatus("云同步设置已保存到本浏览器。");
+    }
+    function cloudParts() {
+      const [owner, repo] = document.getElementById("cloudRepo").value.trim().split("/");
+      return {owner, repo, branch: document.getElementById("cloudBranch").value.trim() || "main", token: document.getElementById("cloudToken").value.trim()};
+    }
+    function setSyncStatus(text) { document.getElementById("syncStatus").textContent = text; }
+    function scheduleCloudSync() {
+      if (!document.getElementById("cloudToken").value.trim()) return;
+      clearTimeout(syncTimer);
+      syncTimer = setTimeout(pushCloud, 5000);
+      setSyncStatus("本地已保存，等待自动同步。");
+    }
+    async function fetchGithubJson(path) {
+      const c = cloudParts();
+      if (!c.owner || !c.repo || !c.token) throw new Error("请先填写 GitHub token 和仓库。");
+      const url = "https://api.github.com/repos/" + c.owner + "/" + c.repo + "/contents/" + path + "?ref=" + encodeURIComponent(c.branch);
+      const response = await fetch(url, {headers: {Authorization: "Bearer " + c.token, Accept: "application/vnd.github+json"}});
+      if (response.status === 404) return {sha: null, data: {}};
+      if (!response.ok) throw new Error("GitHub 读取失败：" + response.status);
+      const body = await response.json();
+      return {sha: body.sha, data: JSON.parse(base64ToText(body.content || ""))};
+    }
+    async function putGithubJson(path, payload, message, sha) {
+      const c = cloudParts();
+      const url = "https://api.github.com/repos/" + c.owner + "/" + c.repo + "/contents/" + path;
+      const body = {message, branch: c.branch, content: textToBase64(JSON.stringify(payload, null, 2) + "\n")};
+      if (sha) body.sha = sha;
+      const response = await fetch(url, {method: "PUT", headers: {Authorization: "Bearer " + c.token, Accept: "application/vnd.github+json", "Content-Type": "application/json"}, body: JSON.stringify(body)});
+      if (!response.ok) throw new Error("GitHub 写入失败：" + response.status + " " + (await response.text()).slice(0, 200));
+      return response.json();
+    }
+    async function pullCloud() {
+      try {
+        setSyncStatus("正在拉取人物草稿和请求队列...");
+        const edits = await fetchGithubJson("data/character_edit_manifest.json");
+        const remoteJobs = await fetchGithubJson("data/character_jobs.json");
+        characters = mergeCharacters(characters, edits.data.characters || []);
+        jobs = mergeJobs(jobs, remoteJobs.data.jobs || []);
+        saveLocal();
+        render();
+        setSyncStatus("云端人物草稿和队列已合并。");
+      } catch (error) { setSyncStatus(error.message); }
+    }
+    async function pushCloud() {
+      try {
+        saveCloudSettings();
+        const editsRemote = await fetchGithubJson("data/character_edit_manifest.json");
+        const jobsRemote = await fetchGithubJson("data/character_jobs.json");
+        const editPayload = {schema_version: 1, updated_at: new Date().toISOString(), character_count: characters.length, characters};
+        const jobPayload = {schema_version: 1, updated_at: new Date().toISOString(), job_count: jobs.length, jobs};
+        await putGithubJson("data/character_edit_manifest.json", editPayload, "同步人物工作台草稿", editsRemote.sha);
+        await putGithubJson("data/character_jobs.json", jobPayload, "同步人物生成请求队列", jobsRemote.sha);
+        setSyncStatus("人物草稿和请求队列已同步。");
+      } catch (error) { setSyncStatus(error.message + "；本地数据未丢，可先导出 JSON。"); }
+    }
+    document.getElementById("characterSearch").addEventListener("input", renderCharacters);
+    document.getElementById("statusFilter").addEventListener("change", renderCharacters);
+    document.getElementById("addCharacter").addEventListener("click", () => {
+      const id = slugify(prompt("人物 ID，例如 aria_spark") || "");
+      if (!id) return;
+      if (characters.some(c => c.character_id === id)) { alert("人物 ID 已存在"); return; }
+      const name = prompt("人物名", id) || id;
+      characters.push(defaultCharacter(id, name));
+      selectedCharacterId = id;
+      selectedActionId = "";
+      activeStage = "profile";
+      saveLocal();
+      render();
+    });
+    document.getElementById("exportWorkspace").addEventListener("click", () => downloadJson(buildPayload(), "character_workspace_export.json"));
+    document.getElementById("importWorkspace").addEventListener("click", () => document.getElementById("workspaceFile").click());
+    document.getElementById("workspaceFile").addEventListener("change", async event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const imported = JSON.parse(await file.text());
+      characters = mergeCharacters(characters, imported.characters || []);
+      jobs = mergeJobs(jobs, imported.jobs || []);
+      saveLocal();
+      render();
+    });
+    document.getElementById("saveCloudSettings").addEventListener("click", saveCloudSettings);
+    document.getElementById("pullCloud").addEventListener("click", pullCloud);
+    document.getElementById("pushCloud").addEventListener("click", pushCloud);
+    document.getElementById("clearCloudToken").addEventListener("click", () => {
+      document.getElementById("cloudToken").value = "";
+      saveCloudSettings();
+      setSyncStatus("Token 已从本浏览器清除。");
+    });
+    loadCloudSettings();
+    render();
+  </script>
+</body>
+</html>
